@@ -22,33 +22,27 @@ def parse_arguments():
     return parser.parse_args()
 
 async def shutdown():
-    """ Gracefully close all sessions before shutting down the listener. """
+    """ Immediately close all sessions and shut down the listener. """
     global server
     logging.info("[!] Shutting down listener...")
     print("\n[!] Shutting down listener...")
 
-    # Send "die" command to all clients
+    # Send "die" command to all connected clients
     for session_id, session in list(sessions.items()):
         try:
             session['writer'].write(b"die\n")
-            await session['writer'].drain()
-            session['writer'].close()
-            await session['writer'].wait_closed()
+            await session['writer'].drain()  # Flush output buffer
+            session['writer'].close()  # Close socket
         except Exception as e:
             logging.error(f"Error closing session {session_id} ({session['ip']}): {e}")
 
-    sessions.clear()
-    logging.info("[+] All sessions terminated.")
+    sessions.clear()  # Remove all session references
 
     if server:
         server.close()
-        try:
-            await server.wait_closed()
-        except:
-            pass  # Ignore errors
 
-    print("[+] Listener shut down successfully.")
-    sys.exit(0)  # Ensure proper exit
+    print("[+] Listener shut down immediately.")
+    sys.exit(0)  # Force immediate exit
 
 
 def handle_sigint():
