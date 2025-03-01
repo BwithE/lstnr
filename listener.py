@@ -66,7 +66,8 @@ def handle_client(client_socket, addr, session_number):
                     break
 
             if response:
-                response = '\n'.join([line for line in response.splitlines() if not line.startswith('PS ')])
+                # Filter out PS and $ prompts, as well as user@hostname
+                response = '\n'.join([line for line in response.splitlines() if not line.startswith(('PS ', '$ ', 'ubuntu@', 'root@'))])
                 print(f"\n{response}", end="\n\n")
 
     except KeyboardInterrupt:
