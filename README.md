@@ -1,5 +1,5 @@
 # LSTNR
-Python server that receives shell connections from remote devices. 
+Python script that receives shell connections from remote devices. 
 
 Remote devices can be managed from a Command Line Interface (CLI).
 
