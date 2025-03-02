@@ -28,6 +28,9 @@ cd lstnr
 
 2. Have CLIENT connect to LSTNR
     - You can use any of the methods found on https://www.revshells.com
+        - Windows: `Powershell #3 (Base64)`
+        - Linux: `Bash -i`
+        - MacOS: `python3`
 
 # Screenshot examples:
 
