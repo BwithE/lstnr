@@ -83,6 +83,6 @@ cd lstnr
     - This helps if you are also having issues
 
 # TROUBLESHOOTING
-- If a shell hangs, background the session with `CTRL+C` and then reconnect.
-    - If commands stop working, re-run the reverse shell.
+- If a session hangs, background the session with `CTRL+C` and then reconnect.
+    - If commands stop working all together, reconnect to the session and exit, then re-run the reverse shell from the client machine.
 - If you are having issues please feel free to reach out
