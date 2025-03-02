@@ -24,7 +24,7 @@ cd lstnr
     - `exit` : will terminate all sessions and stop the script
 - SESSION COMMANDS
     - `CTRL+C` or `bs` : backgrounds the active session
-    - `exit` or 'die' : while in a session will terminate it
+    - `exit` or `die` : while in a session will terminate it
 
 2. Have CLIENT connect to LSTNR
     - You can use any of the methods found on https://www.revshells.com
