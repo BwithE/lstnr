@@ -3,6 +3,7 @@ import threading
 import sys
 import queue
 import time
+import re
 
 # ANSI escape codes for colors
 RED = "\033[91m"
@@ -56,19 +57,39 @@ def handle_client(client_socket, addr, session_number):
                     del sessions[session_number]
                 return
 
+            # Send the command to the remote session (first time)
             client_socket.send(command.encode() + b"\n")
-
-            response = ""
+            
+            # Wait for the first response (which is likely just the echo of the command)
+            first_response = ""
             while True:
                 part = client_socket.recv(4096).decode(errors="ignore")
-                response += part
+                first_response += part
                 if len(part) < 4096:
                     break
 
-            if response:
-                # Filter out PS and $ prompts, as well as user@hostname
-                response = '\n'.join([line for line in response.splitlines() if not line.startswith(('PS ', '$ ', 'ubuntu@', 'root@'))])
-                print(f"\n{response}", end="\n\n")
+            # Discard the first response (this is the echoed command)
+            # Print nothing for the first response
+
+            # Now, send the command again (second time) and capture the output
+            client_socket.send(command.encode() + b"\n")
+
+            # Clear the second response
+            second_response = ""
+            while True:
+                part = client_socket.recv(4096).decode(errors="ignore")
+                second_response += part
+                if len(part) < 4096:
+                    break
+
+            # Clean up the second response (remove any unwanted prompt)
+            if second_response:
+                # Remove the prompt or echo lines like `$`, `ubuntu@`, or `PS`
+                second_response = '\n'.join([line for line in second_response.splitlines() if line and not re.match(r'^\$|^ubuntu@|^root@|^PS ', line)])
+
+                # Only print the real output (second response)
+                if second_response.strip():  # Avoid printing empty lines
+                    print(f"\n{second_response}", end="\n\n")
 
     except KeyboardInterrupt:
         print(f"\n[*] Session {session_number} moved to background.")
@@ -79,6 +100,8 @@ def handle_client(client_socket, addr, session_number):
     print(f"[-] Session {session_number} disconnected.")
     with lock:
         del sessions[session_number]
+
+
 
 def session_manager():
     """Main menu that allows session management."""
@@ -196,3 +219,4 @@ if __name__ == "__main__":
         sys.exit(0)
     except Exception as e:
         print_error(str(e))
+                           
