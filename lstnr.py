@@ -28,6 +28,7 @@ def print_error(error_message):
 def print_commands():
     """Prints a formal list of available commands."""
     print("\n[+] List of commands:")
+    print("   help | ?  - List this menu")
     print("   ls        - List active sessions")
     print("   cs <id>   - Connect to a specific session by ID")
     print("   bs        - Background the current session")
@@ -114,6 +115,10 @@ def session_manager():
 
             command = input(f"{BLUE}LSTNR$ {RESET}").strip()
             if command == "":
+                print_commands()
+            elif command == "help":
+                print_commands()
+            elif command == "?":
                 print_commands()
             elif command.lower() == "ls":
                 while not notifications.empty():
