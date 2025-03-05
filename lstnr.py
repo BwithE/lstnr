@@ -162,10 +162,20 @@ def session_manager():
                 print("\n+-----------------------+")
                 print("| ID  | IP ADDRESS      |")
                 print("+-----------------------+")
+                session_list = ""
                 for sid, session in sessions.items():
+                    session_list += f"| {sid:<3} | {session['addr'][0]:<15} |\n"
                     print(f"| {sid:<3} | {session['addr'][0]:<15} |")
                 print("+-----------------------+\n")
-                log_to_file("Session list displayed.")
+                
+                # Log the session table into the file
+                log_to_file("Session list displayed:")
+                log_to_file("+-----------------------+")
+                log_to_file("| ID  | IP ADDRESS      |")
+                log_to_file("+-----------------------+")
+                log_to_file(session_list)
+                log_to_file("+-----------------------+\n")
+                
             elif command.startswith("cs "):
                 try:
                     sid = int(command.split()[1])
@@ -266,4 +276,3 @@ if __name__ == "__main__":
         sys.exit(0)
     except Exception as e:
         print_error(str(e))
-                          
