@@ -45,9 +45,9 @@ cd lstnr
 
 <img width="574" alt="Screenshot 2025-03-04 at 8 49 53 PM" src="https://github.com/user-attachments/assets/14e90926-98c6-40b9-85af-ec4dac67c5f5" />
 
-- Press any key to get a list of commands
+- Press any key to get a list of commands, or type `?` or `help`
 
-<img width="727" alt="Screenshot 2025-03-01 at 9 10 50 PM" src="https://github.com/user-attachments/assets/8cc03545-8282-4bbc-8ac3-c59c23b4a273" />
+<img width="729" alt="Screenshot 2025-03-04 at 8 54 01 PM" src="https://github.com/user-attachments/assets/652b6b80-ccfb-49cc-bb31-399716c7aa52" />
 
 - List any active sessions
 
@@ -55,35 +55,35 @@ cd lstnr
 
 - When a session is established
 
-<img width="818" alt="Screenshot 2025-03-01 at 9 12 06 PM" src="https://github.com/user-attachments/assets/98584501-4b73-4c79-9dad-fc06193625ab" />
+<img width="823" alt="Screenshot 2025-03-04 at 8 54 26 PM" src="https://github.com/user-attachments/assets/c0fa029a-0e1f-4639-8f31-77bfbae61805" />
 
-- Connecting to a session
+- Connecting to a session and runnning commands
 
-<img width="610" alt="Screenshot 2025-03-01 at 9 12 18 PM" src="https://github.com/user-attachments/assets/db85499a-2322-49d2-846f-0eac1c68d904" />
+<img width="609" alt="Screenshot 2025-03-04 at 8 54 59 PM" src="https://github.com/user-attachments/assets/71c5985d-1828-41b0-b8d9-e5a3a9bc03de" />
 
-- Running a command
+- Background a session with `bs` or `CTRL+C`
 
-<img width="365" alt="Screenshot 2025-03-01 at 9 14 21 PM" src="https://github.com/user-attachments/assets/54bc1a94-6d3e-4bc9-b5dd-88d54fa9d54c" />
-
-- Background a session with `bs`
-
-<img width="386" alt="Screenshot 2025-03-01 at 9 13 11 PM" src="https://github.com/user-attachments/assets/2dc51949-cee1-454c-9db7-ad147579f800" />
-
-- Background a session with `CTRL+C`
-
-<img width="397" alt="Screenshot 2025-03-01 at 9 12 54 PM" src="https://github.com/user-attachments/assets/eb14dbfd-cd2f-4b86-ad16-b4fcd3d84bc6" />
+<img width="400" alt="Screenshot 2025-03-04 at 8 55 53 PM" src="https://github.com/user-attachments/assets/99dc6c4c-e0da-498d-8ab1-5d68a824cd55" />
 
 - Once you've received other connections, `ls` will always verify
 
-<img width="813" alt="Screenshot 2025-03-01 at 9 13 44 PM" src="https://github.com/user-attachments/assets/72777f84-5597-4211-ad29-a43689594ff2" />
+<img width="847" alt="Screenshot 2025-03-04 at 8 56 14 PM" src="https://github.com/user-attachments/assets/b77d5bef-cc55-4e9f-8949-da6d6a1537a3" />
 
 - Example of a Windows machine connected
 
-<img width="712" alt="Screenshot 2025-03-01 at 9 17 08 PM" src="https://github.com/user-attachments/assets/7fa0601d-7cf3-410f-b6ec-308509788fe0" />
+<img width="711" alt="Screenshot 2025-03-04 at 8 56 27 PM" src="https://github.com/user-attachments/assets/08819944-4c25-4b30-a104-cec389fb44c4" />
+
+- Kill an individual session `exit`
+
+<img width="613" alt="Screenshot 2025-03-04 at 8 57 04 PM" src="https://github.com/user-attachments/assets/a37eee21-7893-452d-b904-c271e5a62096" />
 
 - To kill all sessions, type `exit` at the main menu `lstnr$`
 
-<img width="269" alt="Screenshot 2025-03-01 at 9 17 29 PM" src="https://github.com/user-attachments/assets/0fcd92b1-c16b-43f6-80c7-cfb19ac42e7b" />
+<img width="307" alt="Screenshot 2025-03-04 at 8 57 27 PM" src="https://github.com/user-attachments/assets/76199bbf-4bb9-4ef7-8b8f-be4730336def" />
+
+- LSTNR also keeps a session and command log
+
+<img width="835" alt="Screenshot 2025-03-04 at 8 57 46 PM" src="https://github.com/user-attachments/assets/f958f90e-6782-4b42-abe5-a7ef13821b6f" />
 
 # RECOMMENDED TIPS
 - If you plan on running a command with a long exepected output, such as a `linPEAS.sh` or `winPEAS.exe`; run them in the background and write to a file, and pull the file.
