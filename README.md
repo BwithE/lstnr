@@ -5,6 +5,8 @@ Remote devices can be managed from a Command Line Interface (CLI).
 
 <img width="574" alt="Screenshot 2025-03-04 at 8 49 53 PM" src="https://github.com/user-attachments/assets/0092ba85-1ef6-4d0b-8bd7-39db42a9bc1d" />
 
+FYI: Using `rlwrap` will allow your CLI history remain intact while working.
+
 # DISCLAIMER
 This is only for testing purposes, not intended for anything illegal. I was testing out ways to manage multiple connections while doing the OSCP labs. #Hobbies
 
