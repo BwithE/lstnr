@@ -3,6 +3,8 @@ Python script that receives reverse shell connections from remote devices.
 
 Remote devices can be managed from a Command Line Interface (CLI).
 
+<img width="574" alt="Screenshot 2025-03-04 at 8 49 53 PM" src="https://github.com/user-attachments/assets/0092ba85-1ef6-4d0b-8bd7-39db42a9bc1d" />
+
 # DISCLAIMER
 This is only for testing purposes, not intended for anything illegal. I was testing out ways to manage multiple connections while doing the OSCP labs. #Hobbies
 
@@ -41,7 +43,7 @@ cd lstnr
 
 - Starting the listener
 
-<img width="546" alt="Screenshot 2025-03-01 at 9 10 31 PM" src="https://github.com/user-attachments/assets/9c82b662-63dd-4902-8dfd-8df2580c6e5a" />
+<img width="574" alt="Screenshot 2025-03-04 at 8 49 53 PM" src="https://github.com/user-attachments/assets/14e90926-98c6-40b9-85af-ec4dac67c5f5" />
 
 - Press any key to get a list of commands
 
