@@ -1,17 +1,23 @@
-import select
-import socket
-import threading
-import sys
-import queue
-import time
-import os
+import select  # Allows checking if sockets have available data to read
+import socket  # Provides networking capabilities
+import threading  # Enables running multiple tasks simultaneously (multithreading)
+import sys  # Gives access to system-specific parameters and functions
+import queue  # Implements a FIFO queue, used for handling notifications
+import time  # Used for timestamps and delays
+import os  # Provides OS-related functions like file handling
+import readline  # Allows command history functionality
 
 # ANSI escape codes for colors
 RED = "\033[91m"
 GREEN = "\033[92m"
-RESET = "\033[0m"
-BLUE = "\033[94m"  # Blue for LSTNR$
-ORANGE = "\033[38;5;214m"  # Orange for Session prompt
+BLUE = "\033[94m"
+ORANGE = "\033[38;5;214m"
+PINK = "\033[95m"
+PURPLE = "\033[35m"
+YELLOW = "\033[93m"
+BROWN = "\033[33m"
+RESET = "\033[0m"  # Reset color back to default
+
 
 HOST = "0.0.0.0"
 PORT = None  # Port will be set from command-line arguments
@@ -23,7 +29,12 @@ lock = threading.Lock()
 notifications = queue.Queue()  # Queue to store new session messages
 
 # Log file path with timestamp
-LOG_FILE = f"{time.strftime('%Y-%m-%d_%H-%M-%S')}-sessions.log"
+#LOG_FILE = f"{time.strftime('%Y-%m-%d_%H-%M-%S')}-sessions.log"
+LOG_DIR = "logs-lstnr"  # Directory for logs
+os.makedirs(LOG_DIR, exist_ok=True)  # Ensure the directory exists
+
+LOG_FILE = os.path.join(LOG_DIR, f"{time.strftime('%Y-%m-%d_%H-%M-%S')}-sessions.log")
+
 
 # Initialize logging to a file
 def init_log_file():
@@ -46,33 +57,18 @@ def print_error(error_message):
 
 def print_menu():
     """Prints a formal list of available commands."""
-    message = f"""
-{ORANGE}
-╔════════════════════════════════════════════════════════════╗
+    message = f"""{ORANGE}╔════════════════════════════════════════════════════════════╗
 ║                     AVAILABLE COMMANDS                     ║
 ╠════════════════════════════════════════════════════════════╣
-║ help  | ?  - Show this help menu                           ║
+║ help  | ? - Show this help menu                            ║
 ║ ls        - List active sessions                           ║
 ║ cs <id>   - Connect to a specific session by ID            ║
 ║ bs        - Background the current session                 ║
 ║ die       - Terminate all sessions                         ║
 ║ exit      - Terminate the current session or exit LSTNR    ║
-╚════════════════════════════════════════════════════════════╝
-{RESET}
-"""
+╚════════════════════════════════════════════════════════════╝{RESET}"""
     print(message)
     log_to_file("Displayed menu.")
-
-def print_commands():
-    """Prints a formal list of available commands."""
-    message = "\n[+] List of commands:\n"
-    message += "   help | ?  - List this menu\n"
-    message += "   ls        - List active sessions\n"
-    message += "   cs <id>   - Connect to a specific session by ID\n"
-    message += "   bs        - Background the current session\n"
-    message += "   exit      - Terminate the current session or exit the program\n"
-    print(message)
-    log_to_file(message)  # Log the command list to the file
 
 def handle_client(client_socket, addr, session_number):
     """Creates a fully interactive reverse shell with real-time output."""
@@ -111,7 +107,7 @@ def handle_client(client_socket, addr, session_number):
             # Log the user input command
             if command:
                 log_to_file(f"Command: {command}")
-
+                readline.add_history(command)
             if command.lower() == "bs":
                 print(f"{ORANGE}[*] Session {session_number} moved to background.{RESET}")
                 log_to_file(f"[*] Session {session_number} moved to background.")
@@ -167,7 +163,9 @@ def session_manager():
             
             # Log the command input
             log_to_file(f"LSTNR$ {command}")
-            
+            # this is for command history
+            if command:
+                readline.add_history(command)
             if command == "":
                 #print_commands() # old menu
                 print_menu()  
@@ -181,14 +179,14 @@ def session_manager():
                 while not notifications.empty():
                     print(notifications.get())
 
-                print(f"\n{ORANGE}╔════════════════════════╗")
+                print(f"{ORANGE}╔════════════════════════╗")
                 print(f"║ ID  ║ IP ADDRESS       ║")
                 print(f"╠════════════════════════╣")
                 session_list = ""
                 for sid, session in sessions.items():
                     session_list += f"║ {sid:<3} ║ {session['addr'][0]:<15}  ║\n"
                     print(f"║ {sid:<3} ║ {session['addr'][0]:<15}  ║")
-                print(f"╚════════════════════════╝{RESET}\n")
+                print(f"╚════════════════════════╝{RESET}")
                 
                 # Log the session table into the file
                 log_to_file("Session list displayed:")
@@ -208,8 +206,8 @@ def session_manager():
                 except:
                     print_error("Invalid command. Usage: cs <session_id>")
             elif command.lower() == "die":
-                print(f"{ORANGE}[-] Terminating all sessions...{RESET}")
-                log_to_file("[-] Terminating all sessions...")
+                print(f"{RED}[!] Terminating all sessions.{RESET}")
+                log_to_file("[!] Terminating all sessions.")
                 with lock:
                     for sid in list(sessions.keys()):
                         sessions[sid]["socket"].send(b"exit\n")
@@ -218,15 +216,15 @@ def session_manager():
                 print(f"{ORANGE}[+] All sessions terminated.{RESET}")
                 log_to_file("[+] All sessions terminated.")
             elif command.lower() == "exit":
-                print("Killing all sessions.")
-                print("Shutting down LSTNR.")
-                log_to_file("Killing all sessions. Shutting down LSTNR.")
+                print(f"{RED}[!] Killing all sessions.{RESET}")
+                print(f"{ORANGE}[+] Shutting down LSTNR.{RESET}")
+                log_to_file("[!] Killing all sessions. Shutting down LSTNR.")
                 break
             else:
                 #print_error("Unknown command.") # can print error, but no need anymore
                 print_menu()
         except KeyboardInterrupt:
-            print(f"\n{RED}[*] Type 'exit' to close LSTNR.{RESET}")
+            print(f"\n{RED}[!] Type 'exit' to close LSTNR.{RESET}")
         except Exception as e:
             print_error(str(e))
 
@@ -244,7 +242,7 @@ def start_listener():
         sys.exit(1)
 
     server.listen(5)
-    print(""" 
+    print(f""" {PINK}
     ██╗     ███████╗████████╗███╗   ██╗██████╗ 
     ██║     ██╔════╝╚══██╔══╝████╗  ██║██╔══██╗
     ██║     ███████╗   ██║   ██╔██╗ ██║██████╔╝
@@ -252,9 +250,9 @@ def start_listener():
     ███████╗███████║   ██║   ██║ ╚████║██║  ██║
     ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═╝  ╚═╝
     Remote Command & Control - v0.4
-    - MADE FOR REVERSE SHELL MANAGEMENT
+    - MADE FOR REVERSE SHELL MANAGEMENT{RESET}
     """)
-    print(f"[*] Listening on {HOST}:{PORT}")
+    print(f"{ORANGE}[*] Listening on {HOST}:{PORT}{RESET}")
     log_to_file(f"[*] Listening on {HOST}:{PORT}")
 
     while True:
@@ -270,7 +268,7 @@ def start_listener():
 
 if __name__ == "__main__":
     if len(sys.argv) != 3 or sys.argv[1] != "-p":
-        print_error("Usage: ./listener.py -p <port>")
+        print_error("Usage: ./lstnr.py -p <port>")
         sys.exit(1)
 
     try:
@@ -288,7 +286,7 @@ if __name__ == "__main__":
 
         session_manager()
     except KeyboardInterrupt:
-        print("\n[-] Exiting... Closing all connections.")
+        print(f"\n{RED}[!] Exiting... Closing all connections.{RESET}")
         for sid in list(sessions.keys()):
             try:
                 sessions[sid]["socket"].send(b"exit\n")
