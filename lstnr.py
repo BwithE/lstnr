@@ -5,7 +5,7 @@ import sys  # Gives access to system-specific parameters and functions
 import queue  # Implements a FIFO queue, used for handling notifications
 import time  # Used for timestamps and delays
 import os  # Provides OS-related functions like file handling
-import readline  # Allows command history functionality
+#import readline  # Allows command history functionality
 
 # ANSI escape codes for colors
 RED = "\033[91m"
@@ -107,7 +107,7 @@ def handle_client(client_socket, addr, session_number):
             # Log the user input command
             if command:
                 log_to_file(f"Command: {command}")
-                readline.add_history(command)
+                # readline.add_history(command) # couldnt get to work properly
             if command.lower() == "bs":
                 print(f"{ORANGE}[*] Session {session_number} moved to background.{RESET}")
                 log_to_file(f"[*] Session {session_number} moved to background.")
@@ -152,7 +152,7 @@ def handle_client(client_socket, addr, session_number):
 
 def session_manager():
     """Main menu that allows session management."""
-    time.sleep(1)  # 🟢 Wait for 1 second before dropping into LSTNR$
+    time.sleep(1)  # wait for 1 second before dropping into LSTNR$
     
     while True:
         try:
@@ -164,8 +164,8 @@ def session_manager():
             # Log the command input
             log_to_file(f"LSTNR$ {command}")
             # this is for command history
-            if command:
-                readline.add_history(command)
+            #if command: # couldnt get these two 2 work properly
+            #    readline.add_history(command) # couldnt get these two 2 work properly
             if command == "":
                 #print_commands() # old menu
                 print_menu()  
@@ -249,7 +249,7 @@ def start_listener():
     ██║     ╚════██║   ██║   ██║╚██╗██║██╔══██╗
     ███████╗███████║   ██║   ██║ ╚████║██║  ██║
     ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═╝  ╚═╝
-    Remote Command & Control - v0.4
+    Remote Command & Control - v0.5
     - MADE FOR REVERSE SHELL MANAGEMENT{RESET}
     """)
     print(f"{ORANGE}[*] Listening on {HOST}:{PORT}{RESET}")
