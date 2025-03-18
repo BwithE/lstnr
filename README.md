@@ -75,21 +75,22 @@ cd lstnr
 
 <img width="711" alt="Screenshot 2025-03-04 at 8 56 27 PM" src="https://github.com/user-attachments/assets/08819944-4c25-4b30-a104-cec389fb44c4" />
 
-- Kill an individual session `exit`
+- Kill an individual session `die`
 
-<img width="613" alt="Screenshot 2025-03-04 at 8 57 04 PM" src="https://github.com/user-attachments/assets/a37eee21-7893-452d-b904-c271e5a62096" />
+![image](https://github.com/user-attachments/assets/38a03884-9b75-4499-93fb-da5b39718ad6)
 
-- To kill all sessions, type `exit` at the main menu `lstnr$`
+- To kill all sessions, type `die` at the main menu `lstnr$`
 
-<img width="307" alt="Screenshot 2025-03-04 at 8 57 27 PM" src="https://github.com/user-attachments/assets/76199bbf-4bb9-4ef7-8b8f-be4730336def" />
+![image](https://github.com/user-attachments/assets/ebbc21c5-5481-4c90-8341-275a9bed6f6b)
+
+- To kill `LSTNR$` and all connections, type `exit`
+
+![image](https://github.com/user-attachments/assets/10ebe05b-c320-4465-ab83-a59b0a7f225e)
 
 - LSTNR also keeps a session and command log
 
-<img width="835" alt="Screenshot 2025-03-04 at 8 57 46 PM" src="https://github.com/user-attachments/assets/f958f90e-6782-4b42-abe5-a7ef13821b6f" />
+![image](https://github.com/user-attachments/assets/79d08aae-287d-4f66-b9c4-ed97e7f213c7)
 
-# RECOMMENDED TIPS
-- If you plan on running a command with a long exepected output, such as a `linPEAS.sh` or `winPEAS.exe`; run them in the background and write to a file, and pull the file.
-    - This helps if you are also having issues
 
 # TROUBLESHOOTING
 - If a session hangs, background the session with `CTRL+C` and then reconnect.
