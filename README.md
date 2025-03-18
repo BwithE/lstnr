@@ -3,7 +3,7 @@ Python script that receives reverse shell connections from remote devices.
 
 Remote devices can be managed from a Command Line Interface (CLI).
 
-<img width="574" alt="Screenshot 2025-03-04 at 8 49 53 PM" src="https://github.com/user-attachments/assets/0092ba85-1ef6-4d0b-8bd7-39db42a9bc1d" />
+![image](https://github.com/user-attachments/assets/7940405c-4b42-4d0f-8556-f05b2d2de7ec)
 
 FYI: Using `rlwrap` will allow your CLI history remain intact while working.
 
@@ -45,31 +45,31 @@ cd lstnr
 
 - Starting the listener
 
-<img width="574" alt="Screenshot 2025-03-04 at 8 49 53 PM" src="https://github.com/user-attachments/assets/14e90926-98c6-40b9-85af-ec4dac67c5f5" />
+![image](https://github.com/user-attachments/assets/abee3a21-ffc5-4310-9ccb-6e5f3ef3303a)
 
 - Press any key to get a list of commands, or type `?` or `help`
 
-<img width="729" alt="Screenshot 2025-03-04 at 8 54 01 PM" src="https://github.com/user-attachments/assets/652b6b80-ccfb-49cc-bb31-399716c7aa52" />
+![image](https://github.com/user-attachments/assets/cf0217b8-9f47-47b3-80d7-83f928899839)
 
 - List any active sessions
 
-<img width="337" alt="Screenshot 2025-03-01 at 9 10 41 PM" src="https://github.com/user-attachments/assets/aeb6c1ee-34c7-4261-b070-55e42f9e7855" />
+![image](https://github.com/user-attachments/assets/a9abbfe0-c9a2-4b6a-8f6f-15a0aa7a6cea)
 
 - When a session is established
 
-<img width="823" alt="Screenshot 2025-03-04 at 8 54 26 PM" src="https://github.com/user-attachments/assets/c0fa029a-0e1f-4639-8f31-77bfbae61805" />
+![image](https://github.com/user-attachments/assets/768bc3be-f7c4-44c3-b634-6d16bb9be7ed)
 
-- Connecting to a session and runnning commands
+- Connecting to a session will automatically update the sessions table
 
-<img width="609" alt="Screenshot 2025-03-04 at 8 54 59 PM" src="https://github.com/user-attachments/assets/71c5985d-1828-41b0-b8d9-e5a3a9bc03de" />
+![image](https://github.com/user-attachments/assets/46ff53b3-3e07-4b48-aa39-6283a11f0092)
 
 - Background a session with `bs` or `CTRL+C`
 
-<img width="400" alt="Screenshot 2025-03-04 at 8 55 53 PM" src="https://github.com/user-attachments/assets/99dc6c4c-e0da-498d-8ab1-5d68a824cd55" />
+![image](https://github.com/user-attachments/assets/0c0453f4-6c1d-4a17-a6d2-88ee862aaabc)
 
 - Once you've received other connections, `ls` will always verify
 
-<img width="847" alt="Screenshot 2025-03-04 at 8 56 14 PM" src="https://github.com/user-attachments/assets/b77d5bef-cc55-4e9f-8949-da6d6a1537a3" />
+![image](https://github.com/user-attachments/assets/fb10059b-7766-47bf-9caa-4db0e79adb57)
 
 - Example of a Windows machine connected
 
