@@ -183,8 +183,8 @@ def session_manager():
                 for sid, session in sessions.items():
                     user = session.get("user", "N/A")  # Fetch user info (whoami)
                     hostname = session.get("hostname", "N/A")  # Fetch hostname info
-                    session_list += f"║ {sid:<3} ║ {session['addr'][0]:<15} ║ {user:<15} ║ {hostname:<16}  ║\n"
-                    print(f"║ {sid:<3} ║ {session['addr'][0]:<15} ║ {user:<15} ║ {hostname:<15} ║")
+                    session_list += f"║ {sid:<3} ║ {session['addr'][0]:<15} ║ {user:<15} ║ {hostname:<16} ║\n"
+                    print(f"║ {sid:<3} ║ {session['addr'][0]:<15} ║ {user:<15} ║ {hostname:<16} ║")
                 print(f"╚════════════════════════════════════════════════════════════╝{RESET}")
 
                 # Log the session table into the file
@@ -335,4 +335,3 @@ if __name__ == "__main__":
         sys.exit(0)
     except Exception as e:
         print_error(str(e))
-                          
