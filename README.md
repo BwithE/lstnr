@@ -28,7 +28,7 @@ cd lstnr
     - `exit` : will terminate all sessions and stop the script
 - SESSION COMMANDS
     - `CTRL+C` or `bs` : backgrounds the active session
-    - `exit` or `die` : while in a session will terminate it
+    - `die` : while in a session will terminate it
 
 2. Have CLIENT connect to LSTNR
     - Best options that work with `lstnr.py`
@@ -59,7 +59,7 @@ cd lstnr
 
 ![image](https://github.com/user-attachments/assets/768bc3be-f7c4-44c3-b634-6d16bb9be7ed)
 
-- Connecting to a session will automatically update the sessions table
+- Connecting to a session with `cs <id>` will automatically update the sessions table
 
 ![image](https://github.com/user-attachments/assets/46ff53b3-3e07-4b48-aa39-6283a11f0092)
 
