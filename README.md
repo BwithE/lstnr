@@ -25,6 +25,7 @@ cd lstnr
 - MENU COMMANDS
     - `ls` : lists connected clients
     - `cs <ID>` : connects to that session
+    - `die` : Will terminate all sessions
     - `exit` : will terminate all sessions and stop the script
 - SESSION COMMANDS
     - `CTRL+C` or `bs` : backgrounds the active session
@@ -75,11 +76,13 @@ cd lstnr
 
 - Example of a Windows machine connected
 
+<img width="1171" alt="Screenshot 2025-03-19 at 7 49 26 PM" src="https://github.com/user-attachments/assets/0aa94404-4bfc-4b7c-8f38-d64584329af4" />
+
 <img width="711" alt="Screenshot 2025-03-04 at 8 56 27 PM" src="https://github.com/user-attachments/assets/08819944-4c25-4b30-a104-cec389fb44c4" />
 
 - Kill an individual session `die`
 
-![image](https://github.com/user-attachments/assets/38a03884-9b75-4499-93fb-da5b39718ad6)
+<img width="382" alt="Screenshot 2025-03-19 at 7 50 05 PM" src="https://github.com/user-attachments/assets/7eac2b5f-9670-4f5b-9b93-99c89f98ade6" />
 
 - To kill all sessions, type `die` at the main menu `lstnr$`
 
