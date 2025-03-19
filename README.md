@@ -96,5 +96,6 @@ cd lstnr
 
 # TROUBLESHOOTING
 - If a session hangs, background the session with `CTRL+C` and then reconnect.
-    - If commands stop working all together, reconnect to the session and exit, then re-run the reverse shell from the client machine.
+- Sometimes the `whoami` and `hostname` commannd will hang, just background it and reconnect `cs <id>` and try running it again.
+    - If commands stop working all together, reconnect to the session and run `die`, then re-run the reverse shell from the client machine.
 - If you are having issues please feel free to reach out
