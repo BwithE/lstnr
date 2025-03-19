@@ -184,14 +184,14 @@ def format_session_table(sessions):
     id_width = 5
     ip_width = 18
     user_width = 30
-    hostname_width = 30
+    hostname_width = 20
 
     # Create a formatted table header
-    table = f"\n{'ID'.ljust(id_width)}{'IP ADDRESS'.ljust(ip_width)}{'USER'.ljust(user_width)}{'HOSTNAME'.ljust(hostname_width)}\n"
+    table = f"\n{'ID'.ljust(id_width)}{'IP ADDRESS'.ljust(ip_width)}{'HOSTNAME'.ljust(hostname_width)}{'USER'.ljust(user_width)}\n"
 
     # Loop through the sessions to format each row
     for session in sessions:
-        table += f"{str(session['id']).ljust(id_width)}{session['ip'].ljust(ip_width)}{session['user'].ljust(user_width)}{session['hostname'].ljust(hostname_width)}\n"
+        table += f"{str(session['id']).ljust(id_width)}{session['ip'].ljust(ip_width)}{session['hostname'].ljust(hostname_width)}{session['user'].ljust(user_width)}\n"
 
     return table
 
@@ -288,7 +288,7 @@ def start_listener():
     ██║     ╚════██║   ██║   ██║╚██╗██║██╔══██╗
     ███████╗███████║   ██║   ██║ ╚████║██║  ██║
     ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═╝  ╚═╝
-    Remote Command & Control - v0.6
+    Remote Command & Control - v0.5
     - MADE FOR REVERSE SHELL MANAGEMENT{RESET}
     """)
     print(f"{ORANGE}[*] Listening on {HOST}:{PORT}{RESET}")
