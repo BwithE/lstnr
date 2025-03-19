@@ -3,7 +3,7 @@ Python script that receives reverse shell connections from remote devices.
 
 Remote devices can be managed from a Command Line Interface (CLI).
 
-![image](https://github.com/user-attachments/assets/7940405c-4b42-4d0f-8556-f05b2d2de7ec)
+<img width="550" alt="Screenshot 2025-03-19 at 5 34 42 PM" src="https://github.com/user-attachments/assets/36a56b20-aa1a-4e3d-8605-183dca405d82" />
 
 FYI: Using `rlwrap` will allow your CLI history remain intact while working.
 
@@ -43,33 +43,35 @@ cd lstnr
 
 # Screenshot examples:
 
-- Starting the listener
+- Starting the listener `python3 lstnr.py -p <port>`
 
-![image](https://github.com/user-attachments/assets/abee3a21-ffc5-4310-9ccb-6e5f3ef3303a)
+<img width="550" alt="Screenshot 2025-03-19 at 5 34 42 PM" src="https://github.com/user-attachments/assets/4e232d54-4f4f-49a9-a65a-386f07dde910" />
 
 - Press any key to get a list of commands, or type `?` or `help`
 
 ![image](https://github.com/user-attachments/assets/cf0217b8-9f47-47b3-80d7-83f928899839)
 
-- List any active sessions
+- List any active sessions with `ls`
 
-![image](https://github.com/user-attachments/assets/a9abbfe0-c9a2-4b6a-8f6f-15a0aa7a6cea)
+<img width="934" alt="Screenshot 2025-03-19 at 5 34 55 PM" src="https://github.com/user-attachments/assets/dd192583-c9b8-443e-af28-ee8782a54267" />
 
-- When a session is established
+- When a session is established, `ls` will always verify
 
-![image](https://github.com/user-attachments/assets/768bc3be-f7c4-44c3-b634-6d16bb9be7ed)
+<img width="932" alt="Screenshot 2025-03-19 at 5 35 01 PM" src="https://github.com/user-attachments/assets/9ecff40b-c14d-4a9a-adf9-cc04fb15e7b4" />
 
-- Connecting to a session with `cs <id>` will automatically update the sessions table
+- Connecting to a session with `cs <id>` 
+- To update the sessions table, run `whoami` and `hostname`
+- When you backgrround the session it will update the session table
 
-![image](https://github.com/user-attachments/assets/46ff53b3-3e07-4b48-aa39-6283a11f0092)
+<img width="597" alt="Screenshot 2025-03-19 at 5 35 33 PM" src="https://github.com/user-attachments/assets/6017b8e1-3532-4cfd-86bf-2800d119dc39" />
 
 - Background a session with `bs` or `CTRL+C`
 
 ![image](https://github.com/user-attachments/assets/0c0453f4-6c1d-4a17-a6d2-88ee862aaabc)
 
-- Once you've received other connections, `ls` will always verify
+- To see updated session information, type `ls`
 
-![image](https://github.com/user-attachments/assets/fb10059b-7766-47bf-9caa-4db0e79adb57)
+<img width="939" alt="Screenshot 2025-03-19 at 5 35 45 PM" src="https://github.com/user-attachments/assets/3f5e4aa9-ebd0-40b3-85a6-0c9276dd9a50" />
 
 - Example of a Windows machine connected
 
