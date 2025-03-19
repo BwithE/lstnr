@@ -137,30 +137,36 @@ def handle_client(client_socket, addr, session_number):
                     del sessions[session_number]
                 return
 
-            # Check for "update_info" command
-            if command.lower() == "gather":
+            # Check for "hostname" command
+            if command.lower() == "whoami":
                 try:
                     # The session we're currently working with
                     session = sessions[session_number]  # Get the current session using its session number
                     client_socket = session["socket"]  # The client's socket for this session
-
                     # Gather whoami if not already present
-                    if "whoami" not in session:
-                        client_socket.sendall(b"whoami\n")
-                        whoami_output = client_socket.recv(4096).decode(errors="ignore").strip()
-                        whoami_output = clean_output(whoami_output)
-                        session["whoami"] = whoami_output
-                        print(f"{ORANGE}Captured whoami for session {session_number}: {whoami_output}{RESET}")
-                        log_to_file(f"Captured whoami for session {session_number}: {whoami_output}")
-
+#                    if "whoami" not in session:
+                    client_socket.sendall(b"whoami\n")
+                    whoami_output = client_socket.recv(4096).decode(errors="ignore").strip()
+                    whoami_output = clean_output(whoami_output)
+                    session["whoami"] = whoami_output
+                    print(f"{ORANGE}Captured whoami for session {session_number}: {whoami_output}{RESET}")
+                    log_to_file(f"Captured whoami for session {session_number}: {whoami_output}")
+                except Exception as e:
+                    print_error(f"Error during gather for session {session_number}: {e}")
+            # Check for "hostname" command
+            if command.lower() == "hostname":
+                try:
+                    # The session we're currently working with
+                    session = sessions[session_number]  # Get the current session using its session number
+                    client_socket = session["socket"]  # The client's socket for this session
                     # Gather hostname if not already present
-                    if "hostname" not in session:
-                        client_socket.sendall(b"hostname\n")
-                        hostname_output = client_socket.recv(4096).decode(errors="ignore").strip()
-                        hostname_output = clean_output(hostname_output)
-                        session["hostname"] = hostname_output
-                        print(f"{ORANGE}Captured hostname for session {session_number}: {hostname_output}{RESET}")
-                        log_to_file(f"Captured hostname for session {session_number}: {hostname_output}")
+                    #if "hostname" not in session:
+                    client_socket.sendall(b"hostname\n")
+                    hostname_output = client_socket.recv(4096).decode(errors="ignore").strip()
+                    hostname_output = clean_output(hostname_output)
+                    session["hostname"] = hostname_output
+                    print(f"{ORANGE}Captured hostname for session {session_number}: {hostname_output}{RESET}")
+                    log_to_file(f"Captured hostname for session {session_number}: {hostname_output}")
 
                 except Exception as e:
                     print_error(f"Error during gather for session {session_number}: {e}")
@@ -190,24 +196,33 @@ def handle_client(client_socket, addr, session_number):
     with lock:
         del sessions[session_number]
 
-
 def format_session_table(sessions):
-    """Formats the session table with fixed padding and alignment."""
-    
+    """Formats the session table with custom box-drawing characters."""
+
     # Define fixed width for each column
-    id_width = 5
+    id_width = 6
     ip_width = 18
+    hostname_width = 24
     user_width = 30
-    hostname_width = 20
 
-    # Create a formatted table header
-    table = f"\n{'ID'.ljust(id_width)}{'IP ADDRESS'.ljust(ip_width)}{'HOSTNAME'.ljust(hostname_width)}{'USER'.ljust(user_width)}\n"
+    # Top border
+    table = f"\n╔{'═' * id_width}╦{'═' * ip_width}╦{'═' * hostname_width}╦{'═' * user_width}╗\n"
 
-    # Loop through the sessions to format each row
+    # Header
+    table += f"║{'ID'.center(id_width)}║{'IP ADDRESS'.center(ip_width)}║{'HOSTNAME'.center(hostname_width)}║{'USER'.center(user_width)}║\n"
+
+    # Header separator
+    table += f"╠{'═' * id_width}╩{'═' * ip_width}╩{'═' * hostname_width}╩{'═' * user_width}╣\n"
+
+    # Rows
     for session in sessions:
-        table += f"{str(session['id']).ljust(id_width)}{session['ip'].ljust(ip_width)}{session['hostname'].ljust(hostname_width)}{session['user'].ljust(user_width)}\n"
+        table += f"║{str(session['id']).center(id_width)}║{session['ip'].center(ip_width)}║{session['hostname'].center(hostname_width)}║{session['user'].center(user_width)}║\n"
+
+    # Bottom border (same as the top border)
+    table += f"╚{'═' * id_width}╩{'═' * ip_width}╩{'═' * hostname_width}╩{'═' * user_width}╝\n"
 
     return table
+
 
 def session_manager():
     """Main menu that allows session management."""
