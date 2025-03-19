@@ -92,6 +92,10 @@ cd lstnr
 
 ![image](https://github.com/user-attachments/assets/10ebe05b-c320-4465-ab83-a59b0a7f225e)
 
+- LSTNR WILL NOT CLOSE WITH `CTRL+C`
+
+<img width="508" alt="Screenshot 2025-03-19 at 7 50 29 PM" src="https://github.com/user-attachments/assets/74e8f8f9-989b-4284-8e02-cd83cf84c34d" />
+
 - LSTNR also keeps a session and command log
 
 ![image](https://github.com/user-attachments/assets/79d08aae-287d-4f66-b9c4-ed97e7f213c7)
