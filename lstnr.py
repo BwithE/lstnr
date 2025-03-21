@@ -79,7 +79,7 @@ def print_menu():
 ║ hostname  - Updates the session table                      ║
 ║ bs        - Background the current session                 ║
 ║ die       - Terminates the current session                 ║
-╚════════════════════════════════════════════════════════════╝{RESET}"""
+╚════════════════════════════════════════════════════════════╝{RESET}\n"""
     print(message)
     log_to_file("Displayed menu.")
 
