@@ -65,7 +65,7 @@ def print_error(error_message):
 def print_menu():
     """Prints a formal list of available commands."""
     message = f"""{ORANGE}\n╔════════════════════════════════════════════════════════════╗
-║                     AVAILABLE COMMANDS                     ║
+║                        MENU COMMANDS                       ║
 ╠════════════════════════════════════════════════════════════╣
 ║ help  | ? - Show this help menu                            ║
 ║ ls        - List active sessions                           ║
@@ -244,9 +244,9 @@ def session_manager():
             # Log the command input
             log_to_file(f"LSTNR$ {command}")
             
-            if command == "":
-                print_menu()  
-            elif command == "help":
+            #if command == "":
+            #    print_menu()  
+            if command == "help":
                 print_menu()
             elif command == "?":
                 print_menu()
