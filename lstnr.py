@@ -71,7 +71,7 @@ def print_menu():
 ║ ls            - List active sessions                        ║
 ║ cs <id>       - Connect to a specific session by ID         ║
 ║ die           - Terminate all sessions                      ║
-║ exit          - Terminate the current session or exit LSTNR ║
+║ exit          - Terminate all sessions and shuts down LSTNR ║
 ╠═════════════════════════════════════════════════════════════╣
 ║                      SESSION COMMANDS                       ║
 ╠═════════════════════════════════════════════════════════════╣
