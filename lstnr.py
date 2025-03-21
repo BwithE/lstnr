@@ -244,8 +244,9 @@ def session_manager():
             # Log the command input
             log_to_file(f"LSTNR$ {command}")
             
-            #if command == "":
-            #    print_menu()  
+            if command == "":
+                #print_menu()
+                print("\n")
             if command == "help":
                 print_menu()
             elif command == "?":
