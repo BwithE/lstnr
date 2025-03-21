@@ -246,7 +246,7 @@ def session_manager():
             
             if command == "":
                 print_menu()
-            if command == "help":
+            elif command == "help":
                 print_menu()
             elif command == "?":
                 print_menu()
