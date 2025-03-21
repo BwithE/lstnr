@@ -149,8 +149,7 @@ def handle_client(client_socket, addr, session_number):
                     # The session we're currently working with
                     session = sessions[session_number]  # Get the current session using its session number
                     client_socket = session["socket"]  # The client's socket for this session
-                    # Gather whoami if not already present
-#                    if "whoami" not in session:
+                    time.sleep(1)
                     client_socket.sendall(b"whoami\n")
                     whoami_output = client_socket.recv(4096).decode(errors="ignore").strip()
                     whoami_output = clean_output(whoami_output)
@@ -165,8 +164,7 @@ def handle_client(client_socket, addr, session_number):
                     # The session we're currently working with
                     session = sessions[session_number]  # Get the current session using its session number
                     client_socket = session["socket"]  # The client's socket for this session
-                    # Gather hostname if not already present
-                    #if "hostname" not in session:
+                    time.sleep(1)
                     client_socket.sendall(b"hostname\n")
                     hostname_output = client_socket.recv(4096).decode(errors="ignore").strip()
                     hostname_output = clean_output(hostname_output)
