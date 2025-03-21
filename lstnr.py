@@ -70,9 +70,15 @@ def print_menu():
 ║ help  | ? - Show this help menu                            ║
 ║ ls        - List active sessions                           ║
 ║ cs <id>   - Connect to a specific session by ID            ║
-║ bs        - Background the current session                 ║
 ║ die       - Terminate all sessions                         ║
 ║ exit      - Terminate the current session or exit LSTNR    ║
+╠════════════════════════════════════════════════════════════╣
+║                      SESSION COMMANDS                      ║
+╠════════════════════════════════════════════════════════════╣
+║ whoami    - Updates the session table                      ║
+║ hostname  - Updates the session table                      ║
+║ bs        - Background the current session                 ║
+║ die       - Terminates the current session                 ║
 ╚════════════════════════════════════════════════════════════╝{RESET}"""
     print(message)
     log_to_file("Displayed menu.")
