@@ -64,22 +64,22 @@ def print_error(error_message):
 
 def print_menu():
     """Prints a formal list of available commands."""
-    message = f"""{ORANGE}\n╔════════════════════════════════════════════════════════════╗
-║                        MENU COMMANDS                       ║
-╠════════════════════════════════════════════════════════════╣
-║ help  | ? - Show this help menu                            ║
-║ ls        - List active sessions                           ║
-║ cs <id>   - Connect to a specific session by ID            ║
-║ die       - Terminate all sessions                         ║
-║ exit      - Terminate the current session or exit LSTNR    ║
-╠════════════════════════════════════════════════════════════╣
-║                      SESSION COMMANDS                      ║
-╠════════════════════════════════════════════════════════════╣
-║ whoami    - Updates the session table                      ║
-║ hostname  - Updates the session table                      ║
-║ bs        - Background the current session                 ║
-║ die       - Terminates the current session                 ║
-╚════════════════════════════════════════════════════════════╝{RESET}\n"""
+    message = f"""{ORANGE}\n╔═════════════════════════════════════════════════════════════╗
+║                        MENU COMMANDS                        ║
+╠═════════════════════════════════════════════════════════════╣
+║ help | ?      - Show this help menu                         ║
+║ ls            - List active sessions                        ║
+║ cs <id>       - Connect to a specific session by ID         ║
+║ die           - Terminate all sessions                      ║
+║ exit          - Terminate the current session or exit LSTNR ║
+╠═════════════════════════════════════════════════════════════╣
+║                      SESSION COMMANDS                       ║
+╠═════════════════════════════════════════════════════════════╣
+║ whoami        - Updates the session table                   ║
+║ hostname      - Updates the session table                   ║
+║ bs | CTRL+c   - Background the current session              ║
+║ die           - Terminates the current session              ║
+╚═════════════════════════════════════════════════════════════╝{RESET}\n"""
     print(message)
     log_to_file("Displayed menu.")
 
