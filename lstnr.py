@@ -256,12 +256,11 @@ def session_manager():
             # Log the command input
             log_to_file(f"LSTNR$ {command}")
             
-            if command == "":
-                print_menu()
-            elif command == "help":
-                print_menu()
-            elif command == "?":
-                print_menu()
+            if command == "help" or command == "?":
+                print_menu()  # Show menu only if help or ? is typed
+            elif command == "": 
+                # If the command is empty, do nothing and continue waiting for input
+                continue
             elif command.lower() == "ls":
                 # Display new connection notification first if available
                 while not notifications.empty():
@@ -311,7 +310,7 @@ def session_manager():
                 log_to_file("[!] Killing all sessions. Shutting down LSTNR.")
                 break
             else:
-                print_menu()
+                print_menu()  # If command doesn't match any known ones, display the menu
         except KeyboardInterrupt:
             print(f"\n{RED}[!] Type 'exit' to close LSTNR.{RESET}")
         except Exception as e:
