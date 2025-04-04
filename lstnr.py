@@ -70,8 +70,8 @@ def print_menu():
 ║ help | ?        - Show this help menu                         ║
 ║ ls              - List active sessions                        ║
 ║ cs <id>         - Connect to a specific session by ID         ║
-║ die             - Terminate all sessions                      ║
-║ exit            - Terminate all sessions and shuts down LSTNR ║
+║ die             - Kill all sessions                           ║
+║ exit            - Kill all sessions and shuts down LSTNR      ║
 ╠═══════════════════════════════════════════════════════════════╣
 ║                       SESSION COMMANDS                        ║
 ╠═══════════════════════════════════════════════════════════════╣
@@ -81,7 +81,7 @@ def print_menu():
 ║ stable          - TTY shell upgrade for Linux systems         ║
 ║ payload windows - Builds a rev.ps1 on TGT and a new session   ║
 ║ payload linux   - Builds a rev.sh on TGT and a new session    ║
-║ die             - Terminates the current session              ║
+║ die             - Kills the current session                   ║
 ╚═══════════════════════════════════════════════════════════════╝{RESET}\n"""
     print(message)
     log_to_file("Displayed menu.")
@@ -132,8 +132,8 @@ def handle_client(client_socket, addr, session_number):
                 return
 
             if command.lower() == "die":
-                print(f"{ORANGE}[-] Terminating session {session_number}.{RESET}")
-                log_to_file(f"[-] Terminating session {session_number}.")
+                print(f"{ORANGE}[-] Killing session {session_number}.{RESET}")
+                log_to_file(f"[-] Killing session {session_number}.")
                 stop_event.set()  # Stop receiving thread
                 recv_thread.join()  # Wait for thread to fully stop
                 try:
@@ -364,8 +364,8 @@ def session_manager():
                         sessions[sid]["socket"].send(b"exit\n")
                         sessions[sid]["socket"].close()
                         del sessions[sid]
-                print(f"{ORANGE}[+] All sessions terminated.{RESET}")
-                log_to_file("[+] All sessions terminated.")
+                print(f"{ORANGE}[+] All sessions killed.{RESET}")
+                log_to_file("[+] All sessions killed.")
             elif command.lower() == "exit":
                 print(f"{ORANGE}[!] Killing all sessions.{RESET}")
                 print(f"{PINK}[+] Shutting down LSTNR.{RESET}")
