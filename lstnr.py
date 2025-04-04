@@ -188,7 +188,7 @@ def handle_client(client_socket, addr, session_number):
                     print(f"{ORANGE}[*] Sent TTY upgrade command to session {session_number}.{RESET}")
                     log_to_file(f"[*] Sent TTY upgrade command to session {session_number}.")
                 except Exception as e:
-                print_error(f"Error during shell upgrade for session {session_number}: {e}")
+                    print_error(f"Error during shell upgrade for session {session_number}: {e}")
 
             # Send other commands to the client
             else:
