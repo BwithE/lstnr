@@ -1,5 +1,5 @@
 # LSTNR
-Python script that receives reverse shell connections from remote devices. 
+Python script that receives reverse shell connections from remote devices. Multi-Handler.
 
 Remote devices can be managed from a Command Line Interface (CLI).
 
