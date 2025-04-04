@@ -30,6 +30,7 @@ cd lstnr
 - SESSION COMMANDS
     - `hostname` : updates session table information
     - `whoami`: updates session table information
+    - `stable` : upgrades TTY shell
     - `payload windows` : creates a rev.ps1 on tgt, and then executes it calling back to LSTNR
     - `payload linux` : creates a rev.sh on tgt, and then executes it calling back to LSTNR
     - `CTRL+C` or `bs` : backgrounds the active session
@@ -70,6 +71,10 @@ cd lstnr
 - When you backgrround the session it will update the session table
 
 <img width="597" alt="Screenshot 2025-03-19 at 5 35 33 PM" src="https://github.com/user-attachments/assets/6017b8e1-3532-4cfd-86bf-2800d119dc39" />
+
+- Upgrade your shell with `stable`
+
+![image](https://github.com/user-attachments/assets/f122bd70-6b46-4c22-8d6f-0044610a0245)
 
 - Building a new session "revshell" with `payload linux`
 
