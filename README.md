@@ -72,11 +72,12 @@ cd lstnr
 <img width="597" alt="Screenshot 2025-03-19 at 5 35 33 PM" src="https://github.com/user-attachments/assets/6017b8e1-3532-4cfd-86bf-2800d119dc39" />
 
 - Building a new session "revshell" with `payload linux`
+
 ![image](https://github.com/user-attachments/assets/13e5fb67-b891-4cd8-975a-6cca5bbe36f2)
 
 - Building a new session "revshell" with `payload windows`
-![image](https://github.com/user-attachments/assets/e5a8d0b7-b084-477e-a5df-4c32e88d7ee0)
 
+![image](https://github.com/user-attachments/assets/e5a8d0b7-b084-477e-a5df-4c32e88d7ee0)
 
 - Background a session with `bs` or `CTRL+C`
 
