@@ -28,8 +28,13 @@ cd lstnr
     - `die` : Will terminate all sessions
     - `exit` : will terminate all sessions and stop the script
 - SESSION COMMANDS
+    - `hostname` : updates session table information
+    - `whoami`: updates session table information
+    - `payload windows` : creates a rev.ps1 on tgt, and then executes it calling back to LSTNR
+    - `payload linux` : creates a rev.sh on tgt, and then executes it calling back to LSTNR
     - `CTRL+C` or `bs` : backgrounds the active session
     - `die` : while in a session will terminate it
+
 
 2. Have CLIENT connect to LSTNR
     - Best options that work with `lstnr.py`
