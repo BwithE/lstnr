@@ -78,7 +78,7 @@ def print_menu():
 ║ whoami        - Updates the session table                   ║
 ║ hostname      - Updates the session table                   ║
 ║ bs | CTRL+c   - Background the current session              ║
-║ stable        - Python3 TTY shell                           ║
+║ stable        - TTY shell upgrade                           ║
 ║ die           - Terminates the current session              ║
 ╚═════════════════════════════════════════════════════════════╝{RESET}\n"""
     print(message)
