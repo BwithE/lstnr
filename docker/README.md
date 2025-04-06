@@ -2,7 +2,9 @@
 
 I created this to make deploying my Attack-Box easy and convenient.
 
-LSTNR starts on port 443, which also calls to Up.py webserver on port 80 which recieves GET/POST requests to transfers files.
+LSTNR starts on port 443
+
+An UPPY webserver starts on port 80 in the background, which recieves GET/POST requests to transfers files.
 
 Tools can be found in /opt/tools within the container.
 
@@ -13,3 +15,8 @@ Tools can be found in /opt/tools within the container.
 
 # TO DO
 - Will be adding more tools that need to be transferred to TGT
+
+# USAGE
+```
+sudo bash build-lstnr.sh
+```
