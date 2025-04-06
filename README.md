@@ -54,9 +54,9 @@ cd lstnr
 
 <img width="550" alt="Screenshot 2025-03-19 at 5 34 42 PM" src="https://github.com/user-attachments/assets/4e232d54-4f4f-49a9-a65a-386f07dde910" />
 
-- Press any key to get a list of commands, or type `?` or `help`
+- To get a list of commands, or type `?` or `help`
 
-![image](https://github.com/user-attachments/assets/cf0217b8-9f47-47b3-80d7-83f928899839)
+![image](https://github.com/user-attachments/assets/16392e49-efd9-4aa2-9a8f-de52eaf87678)
 
 - List any active sessions with `ls`
 
@@ -65,6 +65,17 @@ cd lstnr
 - When a session is established, `ls` will always verify
 
 <img width="932" alt="Screenshot 2025-03-19 at 5 35 01 PM" src="https://github.com/user-attachments/assets/9ecff40b-c14d-4a9a-adf9-cc04fb15e7b4" />
+
+- To build reverse shells for Windows PowerShell
+```
+payload windows -lhost <IP> -lport <PORT>
+```
+
+- To build reverse shells for Linux /bin/sh
+```
+payload linux -lhost <IP> -lport <PORT>
+```
+![image](https://github.com/user-attachments/assets/655a628c-bcd5-4aac-b7c1-6d76cad63c52)
 
 - Connecting to a session with `cs <id>` 
 - To update the sessions table, run `whoami` and `hostname`
