@@ -30,6 +30,7 @@ lock = threading.Lock()
 
 notifications = queue.Queue()  # Queue to store new session messages
 
+# up.py http server support
 http_server_process = None
 
 # Log file path with timestamp
@@ -85,6 +86,8 @@ def print_menu():
 ║ Connect to a session by ID                                     cs <id> ║
 ║ Save rev.sh locally            payload linux -lhost <IP> -lport <PORT> ║
 ║ Save rev.ps1 locally         payload windows -lhost <IP> -lport <PORT> ║
+║ Start up.py HTTP server                                     http start ║
+║ Stop up.py HTTP server                                       http stop ║
 ║ Kill all sessions                                                  die ║
 ║ Kill all and shutdown LSTNR                                       exit ║
 ╠════════════════════════════════════════════════════════════════════════╣
@@ -459,11 +462,11 @@ def session_manager():
                 continue
 # start and stop http server
             # Start HTTP server
-            elif command.lower() == "start http":
+            elif command.lower() == "http start":
                 start_http_server()
 
             # Stop HTTP server
-            elif command.lower() == "stop http":
+            elif command.lower() == "http stop":
                 stop_http_server()
 # kill all sessions
             elif command.lower() == "die":
@@ -491,6 +494,7 @@ def session_manager():
 
 ###################################################################################
 ###################################################################################
+# up.py http server support
 def start_http_server():
     global http_server_process
     if http_server_process is None:
@@ -507,8 +511,6 @@ def start_http_server():
             print_error(f"{RED}[!] Failed to start HTTP server: {e}")
     else:
         print(f"{ORANGE}[*] HTTP server already running.{RESET}")
-
-
 def stop_http_server():
     global http_server_process
     if http_server_process is not None:
@@ -586,6 +588,7 @@ if __name__ == "__main__":
             try:
                 sessions[sid]["socket"].send(b"exit\n")
                 sessions[sid]["socket"].close()
+                # up.py http server support
                 stop_http_server()
             except:
                 pass
