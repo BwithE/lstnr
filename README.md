@@ -54,7 +54,7 @@ cd lstnr
 
 <img width="550" alt="Screenshot 2025-03-19 at 5 34 42 PM" src="https://github.com/user-attachments/assets/4e232d54-4f4f-49a9-a65a-386f07dde910" />
 
-- To get a list of commands, or type `?` or `help`
+- To get a list of commands, type `?` or `help`
 
 ![image](https://github.com/user-attachments/assets/16392e49-efd9-4aa2-9a8f-de52eaf87678)
 
@@ -79,7 +79,7 @@ payload linux -lhost <IP> -lport <PORT>
 
 - Connecting to a session with `cs <id>` 
 - To update the sessions table, run `whoami` and `hostname`
-- When you backgrround the session it will update the session table
+- When you background the session it will show the updated session table
 
 <img width="597" alt="Screenshot 2025-03-19 at 5 35 33 PM" src="https://github.com/user-attachments/assets/6017b8e1-3532-4cfd-86bf-2800d119dc39" />
 
