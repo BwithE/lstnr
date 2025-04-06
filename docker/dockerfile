@@ -1,0 +1,43 @@
+FROM ubuntu:latest
+
+# Avoid prompts during install
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y rlwrap python3 git curl wget && \
+    apt-get clean
+
+# Make tools directory
+RUN mkdir -p /opt/tools
+
+# Set working directory
+WORKDIR /opt/tools
+
+# Clone your repo
+RUN git clone https://github.com/bwithe/lstnr /opt/lstnr
+RUN cp /opt/lstnr/lstnr.py /opt/tools/
+RUN git clone https://github.com/bwithe/uppy /opt/uppy
+RUN cp /opt/uppy/up.py /opt/tools/
+
+# latest linpeas.sh and winPEASx64.exe
+RUN bash -c "wget \$(curl -s https://api.github.com/repos/peass-ng/PEASS-ng/releases/latest | grep browser_download_url | grep linpeas.sh | cut -d '\"' -f 4) -O /opt/tools/linpeas.sh" && \
+    chmod +x /opt/tools/linpeas.sh && \
+    bash -c "wget \$(curl -s https://api.github.com/repos/peass-ng/PEASS-ng/releases/latest | grep browser_download_url | grep winPEASx64.exe | cut -d '\"' -f 4) -O /opt/tools/winPEASx64.exe"
+
+# pspy64
+RUN wget https://github.com/DominicBreuker/pspy/releases/download/v1.2.1/pspy64 -O /opt/tools/pspy64 && \
+    chmod +x /opt/tools/pspy64
+
+# Set up alias in .bashrc
+#RUN echo "alias lstnr='rlwrap python3 /opt/lstr/lstnr.py -p 443'" >> /root/.bashrc
+
+# Expose necessary ports
+EXPOSE 80
+EXPOSE 443
+EXPOSE 21
+EXPOSE 4444
+
+# Start interactive shell
+#CMD ["/bin/bash"]
+CMD ["rlwrap", "python3", "/opt/tools/lstnr.py", "-p", "443"]
