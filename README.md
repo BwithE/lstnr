@@ -8,7 +8,7 @@ Remote devices can be managed from a Command Line Interface (CLI).
 FYI: Using `rlwrap` will allow your CLI history remain intact while working.
 
 # DISCLAIMER
-This is only for testing purposes, not intended for anything illegal. I was testing out ways to manage multiple connections while doing the OSCP labs. #Hobbies
+This is only for testing purposes, not intended for anything illegal. I was testing out ways to manage multiple connections while doing the OSCP, HTB and THM labs. #Hobbies
 
 # Download LSTNR
 
