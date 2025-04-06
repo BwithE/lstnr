@@ -30,9 +30,6 @@ lock = threading.Lock()
 
 notifications = queue.Queue()  # Queue to store new session messages
 
-# up.py http server support
-http_server_process = None
-
 # Log file path with timestamp
 #LOG_FILE = f"{time.strftime('%Y-%m-%d_%H-%M-%S')}-sessions.log"
 LOG_DIR = "logs-lstnr"  # Directory for logs
@@ -40,16 +37,12 @@ os.makedirs(LOG_DIR, exist_ok=True)  # Ensure the directory exists
 
 LOG_FILE = os.path.join(LOG_DIR, f"{time.strftime('%Y-%m-%d_%H-%M-%S')}-sessions.log")
 
-###################################################################################
-###################################################################################
 def clean_output(output):
     """Cleans the output by removing the command prompt part (if any)."""
     # Remove Windows PowerShell or Command Prompt prompts like 'PS C:\Users\username>'
     cleaned_output = re.sub(r'PS\s.*?>\s*$', '', output)
     return cleaned_output.strip()
 
-###################################################################################
-###################################################################################
 # Initialize logging to a file
 def init_log_file():
     """Initialize the log file by writing a header."""
@@ -58,23 +51,17 @@ def init_log_file():
         log_file.write("Start Time: {}\n".format(time.ctime()))
         log_file.write("="*50 + "\n")
 
-###################################################################################
-###################################################################################
 def log_to_file(message):
     """Log message to the sessions.log file."""
     with open(LOG_FILE, 'a') as log_file:
         log_file.write(message + "\n")
 
-###################################################################################
-###################################################################################
 def print_error(error_message):
     """Prints errors in red."""
     message = f"{RED}[!] ERROR: {error_message}{RESET}"
     print(message)
     log_to_file(message)  # Log error to the file
 
-###################################################################################
-###################################################################################
 def print_menu():
     """Prints a formal list of available commands."""
     message = f"""{ORANGE}
@@ -86,8 +73,6 @@ def print_menu():
 ║ Connect to a session by ID                                     cs <id> ║
 ║ Save rev.sh locally            payload linux -lhost <IP> -lport <PORT> ║
 ║ Save rev.ps1 locally         payload windows -lhost <IP> -lport <PORT> ║
-║ Start up.py HTTP server                                     http start ║
-║ Stop up.py HTTP server                                       http stop ║
 ║ Kill all sessions                                                  die ║
 ║ Kill all and shutdown LSTNR                                       exit ║
 ╠════════════════════════════════════════════════════════════════════════╣
@@ -105,9 +90,6 @@ def print_menu():
     print(message)
     log_to_file("Displayed menu.")
 
-
-###################################################################################
-###################################################################################
 def handle_client(client_socket, addr, session_number):
     """Creates a fully interactive reverse shell with real-time output."""
     print(f"{GREEN}[+] Session {session_number} connected from {addr}{RESET}")
@@ -298,8 +280,6 @@ def handle_client(client_socket, addr, session_number):
     with lock:
         del sessions[session_number]
 
-###################################################################################
-###################################################################################
 def format_session_table(sessions):
     """Formats the session table with custom box-drawing characters."""
 
@@ -327,8 +307,7 @@ def format_session_table(sessions):
 
     return table
 
-###################################################################################
-###################################################################################
+
 def session_manager():
     """Main menu that allows session management."""
     time.sleep(1)  # wait for 1 second before dropping into LSTNR$
@@ -460,14 +439,10 @@ def session_manager():
                 except Exception as e:
                     print_error(f"[!] Error creating Linux payload: {e}")
                 continue
-# start and stop http server
-            # Start HTTP server
-            elif command.lower() == "http start":
-                start_http_server()
 
-            # Stop HTTP server
-            elif command.lower() == "http stop":
-                stop_http_server()
+
+
+
 # kill all sessions
             elif command.lower() == "die":
                 print(f"{ORANGE}[!] Killing all sessions.{RESET}")
@@ -492,39 +467,7 @@ def session_manager():
         except Exception as e:
             print_error(str(e))
 
-###################################################################################
-###################################################################################
-# up.py http server support
-def start_http_server():
-    global http_server_process
-    if http_server_process is None:
-        try:
-            log_file = open("logs-lstnr/up.log", "w")  # You can also append with "a"
-            http_server_process = subprocess.Popen(
-                [sys.executable, "up.py"],
-                stdout=log_file,
-                stderr=subprocess.DEVNULL
-            )
-            print(f"{PINK}[+] HTTP upload server started on port 80.{RESET}")
-            log_to_file("[+] HTTP upload server started.")
-        except Exception as e:
-            print_error(f"{RED}[!] Failed to start HTTP server: {e}")
-    else:
-        print(f"{ORANGE}[*] HTTP server already running.{RESET}")
-def stop_http_server():
-    global http_server_process
-    if http_server_process is not None:
-        http_server_process.terminate()
-        http_server_process = None
-        print(f"{ORANGE}[+] HTTP upload server stopped.{RESET}")
-        log_to_file("[+]] HTTP upload server stopped.")
-    else:
-        print(f"{ORANGE}[!] HTTP server is not running.{RESET}")
 
-
-
-###################################################################################
-###################################################################################
 def start_listener():
     """Starts the listener and accepts incoming connections."""
     global session_id
@@ -588,11 +531,8 @@ if __name__ == "__main__":
             try:
                 sessions[sid]["socket"].send(b"exit\n")
                 sessions[sid]["socket"].close()
-                # up.py http server support
-                stop_http_server()
             except:
                 pass
         sys.exit(0)
     except Exception as e:
         print_error(str(e))
-                          
