@@ -16,7 +16,7 @@ WORKDIR /opt/tools
 
 # Clone your repo
 RUN git clone https://github.com/bwithe/lstnr /opt/lstnr
-RUN cp /opt/lstnr/lstnr.py /opt/tools/
+RUN cp /opt/lstnr/docker/lstnr.py /opt/tools/
 RUN git clone https://github.com/bwithe/uppy /opt/uppy
 RUN cp /opt/uppy/up.py /opt/tools/
 
