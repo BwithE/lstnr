@@ -15,10 +15,8 @@ RUN mkdir -p /opt/tools
 WORKDIR /opt/tools
 
 # Clone your repo
-RUN git clone https://github.com/bwithe/lstnr /opt/lstnr
-RUN cp /opt/lstnr/docker/lstnr.py /opt/tools/
-RUN git clone https://github.com/bwithe/uppy /opt/uppy
-RUN cp /opt/uppy/up.py /opt/tools/
+RUN git clone https://github.com/bwithe/lstnr /opt/lstnr && cp /opt/lstnr/docker/lstnr.py /opt/tools/lstnr.py
+RUN git clone https://github.com/bwithe/uppy /opt/uppy && cp /opt/uppy/up.py /opt/tools/up.py
 
 # latest linpeas.sh and winPEASx64.exe
 RUN bash -c "wget \$(curl -s https://api.github.com/repos/peass-ng/PEASS-ng/releases/latest | grep browser_download_url | grep linpeas.sh | cut -d '\"' -f 4) -O /opt/tools/linpeas.sh" && \
