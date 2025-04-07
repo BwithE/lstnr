@@ -2,7 +2,7 @@
 
 I created this to make deploying my Attack-Box easy and convenient.
 
-LSTNR starts on port 443
+By default, LSTNR starts on port 443. It then forwards all common ports through the host to the container.
 
 An UPPY webserver starts on port 80 in the background, which recieves GET/POST requests to transfers files.
 
