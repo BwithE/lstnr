@@ -39,9 +39,9 @@ os.makedirs(LOG_DIR, exist_ok=True)  # Ensure the directory exists
 LOG_FILE = os.path.join(LOG_DIR, f"{time.strftime('%Y-%m-%d_%H-%M-%S')}-sessions.log")
 
 # command history
-LSTNR_COMMANDS = ['help', 'ls', 'cs', 'payload', 'payload linux -lhost', 'payload windows -lhost', 'die', 'exit']
+LSTNR_COMMANDS = ['help', 'ls', 'cs', 'payload', 'die', 'exit']
 def completer(text, state):
-    options = [cmd for cmd in LSTNR_COMMANDS if cmd.startswith(text)]
+    options = [cmd + ' ' for cmd in LSTNR_COMMANDS if cmd.startswith(text)]
     if state < len(options):
         return options[state]
     else:
