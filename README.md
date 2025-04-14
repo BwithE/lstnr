@@ -5,6 +5,10 @@
 <img width="560" alt="Screenshot 2025-04-13 at 9 25 47 PM" src="https://github.com/user-attachments/assets/8fbbebab-dc2a-4e11-b9f1-ce5081e421bb" />
 
 ---
+# DISCLAIMER
+Not intended for anything illegal. I started working on LSTNR while going through the OSCP labs, and it's since been fun using in HTB and THM labs.
+
+---
 # Menu Usage
 - Type `help` to see a list of commands
 
@@ -26,7 +30,7 @@
 <img width="939" alt="Screenshot 2025-04-13 at 9 31 05 PM" src="https://github.com/user-attachments/assets/9934929d-e470-4e10-8ac2-5f115f78c0bc" />
 
 - To upgrade the `bash` shell, run `stable`
-- From there, if you ccan elevate, do so
+- From there, if you can elevate, do so
 - To build a new shell if you obtain a new user, just run `payload linux`
 - Then type `exit` until you get back to the shell you want
 
@@ -42,3 +46,11 @@
   - `CTRL+C` will not close `LSTNR`
  
 <img width="293" alt="Screenshot 2025-04-13 at 9 34 29 PM" src="https://github.com/user-attachments/assets/94a4c7d2-5a47-491c-b179-ed6d2e1e0c94" />
+
+---
+# TROUBLESHOOTING
+1. In linux, to update the sessions table, i recommend running `whoami` and `hostname` before upgrading to a TTY shell.
+2. You may have issues running `whoami` and `hostname`. If the shell stops responding right after, DON'T PANIC! Just background the session and reconnect. This is an issue im working on.
+
+
+
