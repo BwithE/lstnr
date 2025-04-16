@@ -61,7 +61,7 @@ cd lstnr
 
 - List any active sessions with `ls`
 
-<img width="934" alt="Screenshot 2025-03-19 at 5 34 55 PM" src="https://github.com/user-attachments/assets/dd192583-c9b8-443e-af28-ee8782a54267" />
+<img width="938" alt="Screenshot 2025-04-15 at 9 06 55 PM" src="https://github.com/user-attachments/assets/77e2f37d-f591-4e19-be66-2b73e438fb94" />
 
 - When a session is established, `ls` will always verify
 
@@ -102,13 +102,7 @@ payload linux -lhost <IP> -lport <PORT>
 
 - To see updated session information, type `ls`
 
-<img width="939" alt="Screenshot 2025-03-19 at 5 35 45 PM" src="https://github.com/user-attachments/assets/3f5e4aa9-ebd0-40b3-85a6-0c9276dd9a50" />
-
-- Example of a Windows machine connected
-
-<img width="1171" alt="Screenshot 2025-03-19 at 7 49 26 PM" src="https://github.com/user-attachments/assets/0aa94404-4bfc-4b7c-8f38-d64584329af4" />
-
-<img width="711" alt="Screenshot 2025-03-04 at 8 56 27 PM" src="https://github.com/user-attachments/assets/08819944-4c25-4b30-a104-cec389fb44c4" />
+<img width="924" alt="Screenshot 2025-04-15 at 9 12 11 PM" src="https://github.com/user-attachments/assets/6128c810-7e7b-4950-9b3d-892725155917" />
 
 - Kill an individual session `die`
 
