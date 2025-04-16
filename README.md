@@ -2,9 +2,7 @@
 
 **LSTNR** is a command-line tool designed to manage multiple reverse shell sessions efficiently. It provides an interactive interface with logging, session handling, and real-time command execution.
 
-<img width="550" alt="Screenshot 2025-03-19 at 5 34 42 PM" src="https://github.com/user-attachments/assets/36a56b20-aa1a-4e3d-8605-183dca405d82" />
-
-FYI: Using `rlwrap` will allow your CLI history remain intact while working.
+<img width="543" alt="Screenshot 2025-04-15 at 9 06 02 PM" src="https://github.com/user-attachments/assets/6ede5d5a-c569-49ed-bca5-14d0590eb7d6" />
 
 # DISCLAIMER
 This is only for testing purposes, not intended for anything illegal. I was testing out ways to manage multiple connections while doing the OSCP, HTB and THM labs. #Hobbies
