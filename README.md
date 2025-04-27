@@ -17,7 +17,7 @@
 This is only for testing purposes, not intended for anything illegal. I was testing out ways to manage multiple connections while doing the OSCP, HTB and THM labs. #Hobbies
 
 # UPDATES
-This script no longer needs `rlwrap` to keep the command history. Commmand logging is no longer active. Tab completion has been added to help with the menu, and session commands.
+This script no longer needs `rlwrap` to keep the command history. Commmand logging is no longer active. Tab completion has been added to help with the LSTNR menu, payload and sessions commands. There is a new payload builder menu.
 
 # Download LSTNR
 
