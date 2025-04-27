@@ -22,7 +22,7 @@ This script no longer needs `rlwrap` to keep the command history. Commmand loggi
 # Download LSTNR
 
 ```
-git clone github.com/bwithe/LSNTR
+git clone https://github.com/bwithe/LSNTR
 
 cd lstnr
 ```
