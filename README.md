@@ -57,11 +57,11 @@ Session commands:
 
 - To get a list of commands, type `?` or `help`
 
-<img width="1197" alt="Screenshot 2025-04-26 at 9 59 31 PM" src="https://github.com/user-attachments/assets/d2126ae7-cb0c-4e3c-80e5-b69684b792a4" />
+<img width="779" alt="Screenshot 2025-04-26 at 9 58 21 PM" src="https://github.com/user-attachments/assets/e0709b8b-49cd-4e8b-9540-ce5de8287b46" />
 
 - List any active sessions with `list`
 
-<img width="1066" alt="Screenshot 2025-04-26 at 8 36 49 PM" src="https://github.com/user-attachments/assets/65b0a5a9-f37c-41c0-8f5c-128a3bc834f7" />
+<img width="1197" alt="Screenshot 2025-04-26 at 9 59 31 PM" src="https://github.com/user-attachments/assets/d2126ae7-cb0c-4e3c-80e5-b69684b792a4" />
 
 - To connect to a session, `select <ID>`
 
