@@ -31,17 +31,6 @@ cd lstnr
 
 1. Start LSTNR
     - `python3 lstnr.py -p <PORT_TO_LISTEN>`
-```
-Menu commands:
-    list          - List sessions
-    select <id>   - Connect to a session by its ID
-    die           - Terminate all sessions
-    exit          - Terminate all sessions and exit LSTNR
-Session commands:
-    <any command> - Execute command on client
-    background    - Return to main menu
-    die           - Terminate current session
-```
 2. Have CLIENT connect to LSTNR
     - LSTNR comes with CLIENT scripts:
     - You will have to modify each of the scripts `IP` and `PORT` to connect to LSTNR
