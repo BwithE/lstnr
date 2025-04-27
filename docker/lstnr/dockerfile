@@ -1,0 +1,26 @@
+FROM ubuntu:latest
+
+# Avoid prompts during install
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y rlwrap python3 git curl wget && \
+    apt-get clean
+
+# Make tools directory
+RUN mkdir -p /opt/tools
+
+# Set working directory
+WORKDIR /opt/tools
+
+# Clone repo
+#RUN git clone https://github.com/bwithe/lstnr /opt/lstnr && cp /opt/lstnr/lstnr.py /opt/tools/lstnr.py
+
+# Expose necessary ports
+EXPOSE 443
+
+# Start interactive shell
+CMD ["rlwrap", "python3", "/opt/tools/lstnr.py", "-p", "443"]
+#CMD ["/bin/bash"]
+
