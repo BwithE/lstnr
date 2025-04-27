@@ -1,6 +1,6 @@
 # LSTNR – Reverse Shell Session Manager
 
-**LSTNR** is a command-line tool designed to manage multiple reverse shell sessions efficiently. It provides an interactive interface with logging, session handling, and real-time command execution.
+**LSTNR** is a command line tool designed to manage multiple reverse shell sessions efficiently. It provides an interactive interface with logging, session handling, and real-time command execution.
 
 <img width="543" alt="Screenshot 2025-04-15 at 9 06 02 PM" src="https://github.com/user-attachments/assets/6ede5d5a-c569-49ed-bca5-14d0590eb7d6" />
 
