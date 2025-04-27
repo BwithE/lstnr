@@ -57,7 +57,7 @@ Session commands:
 
 - To get a list of commands, type `?` or `help`
 
-<img width="779" alt="Screenshot 2025-04-26 at 9 58 21 PM" src="https://github.com/user-attachments/assets/f7e0c4bb-a725-4f4a-9cde-81fe513b0d97" />
+<img width="1197" alt="Screenshot 2025-04-26 at 9 59 31 PM" src="https://github.com/user-attachments/assets/d2126ae7-cb0c-4e3c-80e5-b69684b792a4" />
 
 - List any active sessions with `list`
 
