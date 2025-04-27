@@ -44,11 +44,15 @@ Session commands:
 ```
 2. Have CLIENT connect to LSTNR
     - LSTNR comes with CLIENT scripts:
-    - You will have to modify each script `IP` and `PORT` to connect to LSTNR
+    - You will have to modify each of the scripts `IP` and `PORT` to connect to LSTNR
         - `client.py`
+            - Linux and MacOS 
         - `client.ps1`
+            - Windows 
         - `client.sh`
+            - Linux 
         - `client.c`
+            - Windows
             - NEEDS TO BE COMPILED
 ```
 x86_64-w64-mingw32-gcc client.c -o client.exe -lws2_32 -Os -s
