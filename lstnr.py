@@ -131,7 +131,7 @@ def session_shell(client, session_id):
                 print("[*] Backgrounding session.")
                 break
             elif cmd == "die":
-                print(f"[*] Sending 'die' to session {session_id}")
+                print(f"[*] Sending {RED}'die'{RESET} to session {session_id}")
                 try:
                     client.send(b"die\n")
                     time.sleep(0.5)
