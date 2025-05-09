@@ -44,14 +44,34 @@ def log_to_file(client_id, ip, content, direction="send"):
         f.write(f"{timestamp} {prefix} {content}\n")
 
 def format_table(data, headers):
+    # Unicode box-drawing characters
+    top_left = '╔'
+    top_mid = '╦'
+    top_right = '╗'
+    mid_left = '╠'
+    mid_mid = '╬'
+    mid_right = '╣'
+    bottom_left = '╚'
+    bottom_mid = '╩'
+    bottom_right = '╝'
+    horizontal = '═'
+    vertical = '║'
+
+    # Calculate column widths
     col_widths = [max(len(header), max(len(row[i]) for row in data)) for i, header in enumerate(headers)]
+
     def make_row(values):
-        return "| " + " | ".join(f"{str(v).ljust(col_widths[i])}" for i, v in enumerate(values)) + " |"
-    top = "+" + "+".join("-" * (w + 2) for w in col_widths) + "+"
+        return vertical + " " + f" {vertical} ".join(f"{str(v).ljust(col_widths[i])}" for i, v in enumerate(values)) + " " + vertical
+
+    def make_border(left, mid, right):
+        return left + mid.join(horizontal * (w + 2) for w in col_widths) + right
+
+    top = make_border(top_left, top_mid, top_right)
+    divider = make_border(mid_left, mid_mid, mid_right)
+    bottom = make_border(bottom_left, bottom_mid, bottom_right)
     header_row = make_row(headers)
-    divider = "+" + "+".join("=" * (w + 2) for w in col_widths) + "+"
     body = "\n".join(make_row(row) for row in data)
-    bottom = top
+
     return "\n".join([top, header_row, divider, body, bottom])
 
 def clean_output(data, user="Unknown"):
