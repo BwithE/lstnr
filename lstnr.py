@@ -197,13 +197,16 @@ def cli():
 
 def show_help():
     print(f"""
-{ORANGE}Main Menu Commands:{RESET}
-    help                - Show this menu
-    list                - List connected clients
-    select <id>         - Select a client
-    kill <id>           - Terminate and remove a client
-    exit                - Exit the LSTNR
-    payload             - Enter payload menu
+{ORANGE}Menu commands:{RESET}
+    list                - List sessions
+    select <id>         - Connect to a session by its ID
+    payload             - Payload generation menu
+    kill <id>           - Terminate specific session
+    exit                - Terminate all sessions and exit LSTNR
+{ORANGE}Session commands:{RESET}
+    <any command>       - Execute command on client
+    background          - Return to main menu
+    die                 - Terminate current session
 """)
 
 
@@ -376,12 +379,13 @@ subprocess.call(["/bin/sh", "-i"])
     print(f"Payload generated and saved to {filename}\n")
 
 def payload_help():
-    print("""
-    set lhost <ip>      - Set the LHOST for the payload
-    set lport <port>    - Set the LPORT for the payload
-    set payload <type>  - Set the payload type (ex: sh, py, ps1)
-    options             - Show current payload settings
-    generate            - Generate the payload with the current settings
+    print(f"""
+{ORANGE}Payload Menu Commands:{RESET}
+    set lhost <ip>      - Set the LSTNR IP address
+    set lport <port>    - Set the LSTNR listening port
+    set payload <type>  - Set payload type (EX: py, sh, ps1)
+    options             - Show current payload configuration
+    generate            - Generate the payload with current settings
     back                - Return to the main menu
     help                - Show this help menu
 """)
