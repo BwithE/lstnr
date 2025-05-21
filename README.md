@@ -53,6 +53,7 @@ LSTNR> payload
 payload> options 
 
 Current Payload Options:
+
   NAME      : DEFAULT
   LHOST     : 127.0.0.1
   LPORT     : 4444
@@ -67,6 +68,7 @@ payload> set payload sh
 payload> options 
 
 Current Payload Options:
+
   NAME      : Default
   LHOST     : 127.0.0.1
   LPORT     : 22
