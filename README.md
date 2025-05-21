@@ -8,7 +8,6 @@
 ███████╗███████║   ██║   ██║ ╚████║██║  ██║
 ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═╝  ╚═╝
     Remote Command & Control
-    - MADE FOR REVERSE SHELL MANAGEMENT
 ```
 
 **LSTNR** is a command line tool designed to manage multiple reverse shell sessions efficiently. It provides an interactive interface with session handling, and real-time command execution.
