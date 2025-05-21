@@ -18,7 +18,7 @@ This is only for testing purposes, not intended for anything illegal. I was test
 # Download LSTNR
 
 ```
-git clone github.com/bwithe/LSNTR
+git clone https://github.com/bwithe/LSNTR
 
 cd lstnr
 ```
