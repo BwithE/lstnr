@@ -161,7 +161,7 @@ def cli():
 ██║     ╚════██║   ██║   ██║╚██╗██║██╔══██╗
 ███████╗███████║   ██║   ██║ ╚████║██║  ██║
 ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═╝  ╚═╝
-    Remote Command & Control {RESET}
+    Remote Command & Control - v0.9 {RESET}
 """)
     while True:
         try:
