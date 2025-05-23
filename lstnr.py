@@ -435,10 +435,12 @@ def payload_help():
 """)
 
 if __name__ == "__main__":
-    port = 80
-    if len(sys.argv) >= 3 and sys.argv[1] in ("-p", "--port"):
-        port = int(sys.argv[2])
-    elif len(sys.argv) == 2:
-        port = int(sys.argv[1])
-    start_LSTNR("0.0.0.0", port)
-    cli()
+    if len(sys.argv) == 3 and sys.argv[1] in ("-p", "--port"):
+        try:
+            port = int(sys.argv[2])
+            start_LSTNR("0.0.0.0", port)
+            cli()
+        except ValueError:
+            print(f"{RED}[!] Port must be an integer.{RESET}")
+    else:
+        print("[!] Usage: python3 script.py -p <port>")
