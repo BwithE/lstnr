@@ -54,7 +54,7 @@ payload> options
 
 Current Payload Options:
 
-  NAME      : DEFAULT
+  NAME      : Default
   LHOST     : 127.0.0.1
   LPORT     : 4444
   PAYLOAD   : py
