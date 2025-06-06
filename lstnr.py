@@ -474,6 +474,7 @@ $client.Close();
 
     extension, payload_code = payload_map[payload_type]
     filename = f"{name or f'{lhost}_{lport}'}.{extension}"
+    print(f"{GREEN}[+] Payload generated: {filename}{RESET}")
 
     if os.path.exists(filename):
         print(f"{RED}[!] Warning: Overwriting existing file '{filename}'{RESET}")
